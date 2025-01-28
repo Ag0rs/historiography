@@ -92,4 +92,49 @@ public class UserRepository {
             e.printStackTrace();
         }
     }
+
+    public boolean isUserExists(String usernameOrEmail, String password) {
+        try (FileReader reader = new FileReader(USERS_FILE)) {
+            Gson gson = new Gson();
+            JsonObject data = gson.fromJson(reader, JsonObject.class);
+            JsonObject users = data.getAsJsonObject("users");
+
+            for (String username : users.keySet()) {
+                JsonObject user = users.getAsJsonObject(username);
+                // Перевірка по логіну
+                if (user.get("email").getAsString().equals(usernameOrEmail) || username.equals(
+                    usernameOrEmail)) {
+                    if (user.get("password").getAsString().equals(password)) {
+                        return true;
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public User getUser(String usernameOrEmail, String password) {
+        try (FileReader reader = new FileReader(USERS_FILE)) {
+            Gson gson = new Gson();
+            JsonObject data = gson.fromJson(reader, JsonObject.class);
+            JsonObject users = data.getAsJsonObject("users");
+
+            for (String username : users.keySet()) {
+                JsonObject user = users.getAsJsonObject(username);
+                if (user.get("email").getAsString().equals(usernameOrEmail) || username.equals(
+                    usernameOrEmail)) {
+                    if (user.get("password").getAsString().equals(password)) {
+                        return new User(username, user.get("email").getAsString(),
+                            user.get("password").getAsString());
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 }
