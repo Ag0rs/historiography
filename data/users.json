@@ -1,1 +1,79 @@
-{"users":{}}
+{
+  "users": {
+    "admin": {
+      "email": "admin@gmail.com",
+      "password": "123456",
+      "role": "Admin"
+    },
+    "user": {
+      "email": "user@gmail.com",
+      "password": "123456",
+      "role": "User"
+    },
+    "admin123": {
+      "email": "admin123@gmail.com",
+      "password": "1234567",
+      "role": "Admin"
+    },
+    "cdjndcjn": {
+      "email": "cdjjkd@gmail.com",
+      "password": "dsccdscds",
+      "role": "User"
+    },
+    "sdhsjd": {
+      "email": "fdnj@hdhd.pcp",
+      "password": "dsjndskds",
+      "role": "User"
+    },
+    "hdhdshjjhds": {
+      "email": "dscvhsdcgg@gmail.com",
+      "password": "dscdcscds",
+      "role": "User"
+    },
+    "hsdhdshbj": {
+      "email": "asjanxj@sgd.com",
+      "password": "sddsdsdsds",
+      "role": "User"
+    },
+    "hjbcdsbhcdshj": {
+      "email": "sxjhhbsxhb@gsah.com",
+      "password": "dsbhdscsdc",
+      "role": "User"
+    },
+    "sdgccdgds": {
+      "email": "csdjhsdgh@gmk.com",
+      "password": "sddsdsdsds",
+      "role": "User"
+    },
+    "fhdjhdfs": {
+      "email": "hdhdsds@hdshdsj.com",
+      "password": "dsdsds",
+      "role": "User"
+    },
+    "hdbhhdbs": {
+      "email": "chbsh@hbdh.com",
+      "password": "dsdsdsdds",
+      "role": "User"
+    },
+    "sasha": {
+      "email": "sasa32@gmail.com",
+      "password": "1234567",
+      "role": "User"
+    },
+    "GDCGDSGC": {
+      "email": "HBCSDHB@hdsjds.com",
+      "password": "dsdsdsdsds",
+      "role": "Admin"
+    },
+    "admin2": {
+      "email": "admin@gmail.coms",
+      "password": "123456",
+      "role": "Admin"
+    },
+    "adminsa": {
+      "email": "sasha2@gmail.com",
+      "password": "123456",
+      "role": "Admin"
+    }
+  }
+}

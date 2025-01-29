@@ -79,6 +79,8 @@ public class UserRepository {
             JsonObject newUser = new JsonObject();
             newUser.addProperty("email", user.getEmail());
             newUser.addProperty("password", user.getPassword());
+            newUser.addProperty("role", user.getRole()); // Додаємо роль в JSON
+
             users.add(user.getUsername(), newUser);
 
             // Створюємо Gson з форматуванням для красивого виведення
@@ -101,7 +103,7 @@ public class UserRepository {
 
             for (String username : users.keySet()) {
                 JsonObject user = users.getAsJsonObject(username);
-                // Перевірка по логіну
+                // Перевірка по логіну або email
                 if (user.get("email").getAsString().equals(usernameOrEmail) || username.equals(
                     usernameOrEmail)) {
                     if (user.get("password").getAsString().equals(password)) {
@@ -126,15 +128,70 @@ public class UserRepository {
                 if (user.get("email").getAsString().equals(usernameOrEmail) || username.equals(
                     usernameOrEmail)) {
                     if (user.get("password").getAsString().equals(password)) {
+                        String role = user.get("role").getAsString(); // Отримуємо роль
                         return new User(username, user.get("email").getAsString(),
-                            user.get("password").getAsString());
+                            user.get("password").getAsString(), role); // Повертаємо користувача
                     }
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return null;
+        return null; // Якщо користувача не знайдено або пароль невірний
     }
 
+    // Додано метод для отримання користувача за логіном
+    public User getUserByUsername(String username) {
+        try (FileReader reader = new FileReader(USERS_FILE)) {
+            Gson gson = new Gson();
+            JsonObject data = gson.fromJson(reader, JsonObject.class);
+            JsonObject users = data.getAsJsonObject("users");
+
+            // Перевірка на наявність користувача за логіном
+            if (users.has(username)) {
+                JsonObject user = users.getAsJsonObject(username);
+                String email = user.get("email").getAsString();
+                String password = user.get("password").getAsString();
+                String role = user.get("role").getAsString();
+
+                return new User(username, email, password, role); // Повертаємо об'єкт User
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null; // Якщо користувача не знайдено, повертаємо null
+    }
+
+    // Додано метод для отримання користувача за email
+    public User getUserByEmail(String email) {
+        try (FileReader reader = new FileReader(USERS_FILE)) {
+            Gson gson = new Gson();
+            JsonObject data = gson.fromJson(reader, JsonObject.class);
+            JsonObject users = data.getAsJsonObject("users");
+
+            for (String username : users.keySet()) {
+                JsonObject user = users.getAsJsonObject(username);
+                // Перевірка на наявність користувача за email
+                if (user.get("email").getAsString().equals(email)) {
+                    String password = user.get("password").getAsString();
+                    String role = user.get("role").getAsString();
+
+                    return new User(username, email, password, role); // Повертаємо об'єкт User
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null; // Якщо користувача не знайдено, повертаємо null
+    }
+
+    // Додано метод для отримання користувача за логіном або email
+    public User getUserByUsernameOrEmail(String identifier) {
+        // Перевірка чи це логін або пошта
+        User user = getUserByUsername(identifier); // Перший пошук за логіном
+        if (user == null) {
+            user = getUserByEmail(identifier); // Якщо не знайдено, шукаємо за поштою
+        }
+        return user;
+    }
 }

@@ -6,11 +6,17 @@ import com.googlecode.lanterna.graphics.TextGraphics;
 public class MessageManager {
 
     private String successMessage = "";
+    private String successMessage2 = "";
     private String errorMessage = "";
 
     // Метод для встановлення успішного повідомлення
     public void setSuccessMessage(String message) {
         this.successMessage = message;
+    }
+
+    // Метод для встановлення другого успішного повідомлення
+    public void setSuccessMessage2(String message) {
+        this.successMessage2 = message;
     }
 
     // Метод для встановлення повідомлення про помилку
@@ -21,6 +27,7 @@ public class MessageManager {
     // Метод для очищення повідомлень
     public void clearMessages() {
         this.successMessage = "";
+        this.successMessage2 = "";
         this.errorMessage = "";
     }
 
@@ -40,11 +47,12 @@ public class MessageManager {
     public void displayMessagesReg(TextGraphics textGraphics) {
         if (!errorMessage.isEmpty()) {
             textGraphics.setForegroundColor(TextColor.ANSI.RED);
-            textGraphics.putString(10, 15, errorMessage);  // Виведення помилки
+            textGraphics.putString(10, 17, errorMessage);  // Виведення помилки
         }
-        if (!successMessage.isEmpty()) {
+        if (!successMessage2.isEmpty()) {
             textGraphics.setForegroundColor(TextColor.ANSI.GREEN);
-            textGraphics.putString(10, 15, successMessage);  // Виведення успішного повідомлення
+            textGraphics.putString(10, 17,
+                successMessage2);  // Виведення другого успішного повідомлення
         }
     }
 }

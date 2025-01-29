@@ -5,14 +5,22 @@ public class User {
     private String username;
     private String email;
     private String password;
+    private String role; // Додане поле ролі
 
-    public User(String username, String email, String password) {
+    // Оновлений конструктор з підтримкою ролі
+    public User(String username, String email, String password, String role) {
         this.username = username;
         this.email = email;
         this.password = password;
+        this.role = role;
     }
 
-    // Getters and setters (if needed)
+    // Конструктор без ролі (за потреби, для сумісності)
+    public User(String username, String email, String password) {
+        this(username, email, password, "User"); // Роль за замовчуванням — "User"
+    }
+
+    // Getters and setters
     public String getUsername() {
         return username;
     }
@@ -35,5 +43,13 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getRole() { // Геттер для ролі
+        return role;
+    }
+
+    public void setRole(String role) { // Сеттер для ролі
+        this.role = role;
     }
 }
