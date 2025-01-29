@@ -1,6 +1,7 @@
 package com.agors.historiography.appui;
 
 import com.agors.historiography.domain.entitys.User;
+import com.agors.historiography.domain.entitys.UserManager;
 import com.agors.historiography.domain.message.MessageManager;
 import com.agors.historiography.domain.validations.Validation;
 import com.agors.historiography.persistence.repository.UserRepository;
@@ -55,10 +56,12 @@ public class MenuHandler {
             for (int i = 0; i < menuOptions.length; i++) {
                 if (i == selectedIndex) {
                     textGraphics.setForegroundColor(TextColor.ANSI.GREEN);
+                    textGraphics.putString(8, 5 + i,
+                        "▶ " + menuOptions[i]); // Стрілочка для активного пункту
                 } else {
                     textGraphics.setForegroundColor(TextColor.ANSI.WHITE);
+                    textGraphics.putString(10, 5 + i, menuOptions[i]);
                 }
-                textGraphics.putString(10, 5 + i, menuOptions[i]);
             }
             screen.refresh();
 
@@ -474,42 +477,98 @@ public class MenuHandler {
 
     private void showAdminMenu() throws IOException {
         clearScreen();
-        String[] adminMenuOptions = {"Управління користувачами", "Статистика", "Вихід"};
+
+        String[] adminMenuOptions = {
+            "Управління користувачами",
+            "Історичні місця",
+            "Додати історичне місце",
+            "Редагувати історичне місце",
+            "Вихід з акаунта",
+            "Вихід з програми"
+        };
+
         int selectedIndex = 0;
+
+        // Створюємо екземпляр UserManager
+        UserManager userManager = new UserManager(userRepository, textGraphics, screen);
 
         while (true) {
             clearScreen();
+
+            // Заголовок меню
+            textGraphics.setForegroundColor(TextColor.ANSI.CYAN);
+            textGraphics.putString(10, 2, "Меню адміністратора");
+            textGraphics.putString(10, 3, "────────────────────");
+
+            // Відображення пунктів меню
             for (int i = 0; i < adminMenuOptions.length; i++) {
                 if (i == selectedIndex) {
                     textGraphics.setForegroundColor(TextColor.ANSI.GREEN);
+                    textGraphics.putString(8, 5 + i,
+                        "▶ " + adminMenuOptions[i]); // Стрілочка для активного пункту
                 } else {
                     textGraphics.setForegroundColor(TextColor.ANSI.WHITE);
+                    textGraphics.putString(10, 5 + i, adminMenuOptions[i]);
                 }
-                textGraphics.putString(10, 5 + i, adminMenuOptions[i]);
             }
+
             screen.refresh();
 
+            // Обробка клавіш
             KeyStroke keyStroke = screen.readInput();
             switch (keyStroke.getKeyType()) {
                 case ArrowDown:
                     selectedIndex = (selectedIndex + 1) % adminMenuOptions.length;
                     break;
+
                 case ArrowUp:
                     selectedIndex =
                         (selectedIndex - 1 + adminMenuOptions.length) % adminMenuOptions.length;
                     break;
+
                 case Enter:
-                    if (adminMenuOptions[selectedIndex].equals("Управління користувачами")) {
-                        // Додайте код для управління користувачами
-                    } else if (adminMenuOptions[selectedIndex].equals("Статистика")) {
-                        // Додайте код для показу статистики
-                    } else if (adminMenuOptions[selectedIndex].equals("Вихід")) {
-                        screen.stopScreen();
-                        System.exit(0);
+                    switch (selectedIndex) {
+                        case 0: // Управління користувачами
+                            userManager.manageUsers(); // Викликаємо метод manageUsers
+                            break;
+                        case 1: // Історичні місця
+                            viewHistoricalPlaces();
+                            break;
+                        case 2: // Додати історичне місце
+                            addHistoricalPlace();
+                            break;
+                        case 3: // Редагувати історичне місце
+                            editHistoricalPlace();
+                            break;
+                        case 4: // Вихід з акаунта
+                            showLoginWindow();
+                            return;
+                        case 5: // Вихід з програми
+                            screen.stopScreen();
+                            System.exit(0);
+                            break;
                     }
                     break;
+
+                case Escape:
+                    return; // Вихід з меню
             }
         }
+    }
+
+    private void viewHistoricalPlaces() {
+        // TODO: Реалізуйте логіку для перегляду історичних місць
+        System.out.println("Історичні місця - функціонал ще не реалізований.");
+    }
+
+    private void addHistoricalPlace() {
+        // TODO: Реалізуйте логіку для додавання історичного місця
+        System.out.println("Додавання історичного місця - функціонал ще не реалізований.");
+    }
+
+    private void editHistoricalPlace() {
+        // TODO: Реалізуйте логіку для редагування історичного місця
+        System.out.println("Редагування історичного місця - функціонал ще не реалізований.");
     }
 
     private void showUserMenu() throws IOException {

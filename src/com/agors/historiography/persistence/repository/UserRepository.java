@@ -8,10 +8,13 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UserRepository {
 
     private static final String USERS_FILE = "data/users.json";
+    private User currentUser; // Змінна для зберігання поточного користувача
 
     public UserRepository() {
         // Перевірка на наявність файлу та його створення, якщо він не існує
@@ -35,6 +38,14 @@ public class UserRepository {
                 e.printStackTrace();
             }
         }
+    }
+
+    public User getCurrentUser() {
+        return currentUser; // Метод для отримання поточного користувача
+    }
+
+    public void setCurrentUser(User user) {
+        this.currentUser = user; // Метод для встановлення поточного користувача
     }
 
     public boolean isEmailTaken(String email) {
@@ -140,7 +151,6 @@ public class UserRepository {
         return null; // Якщо користувача не знайдено або пароль невірний
     }
 
-    // Додано метод для отримання користувача за логіном
     public User getUserByUsername(String username) {
         try (FileReader reader = new FileReader(USERS_FILE)) {
             Gson gson = new Gson();
@@ -162,7 +172,6 @@ public class UserRepository {
         return null; // Якщо користувача не знайдено, повертаємо null
     }
 
-    // Додано метод для отримання користувача за email
     public User getUserByEmail(String email) {
         try (FileReader reader = new FileReader(USERS_FILE)) {
             Gson gson = new Gson();
@@ -185,7 +194,6 @@ public class UserRepository {
         return null; // Якщо користувача не знайдено, повертаємо null
     }
 
-    // Додано метод для отримання користувача за логіном або email
     public User getUserByUsernameOrEmail(String identifier) {
         // Перевірка чи це логін або пошта
         User user = getUserByUsername(identifier); // Перший пошук за логіном
@@ -193,5 +201,50 @@ public class UserRepository {
             user = getUserByEmail(identifier); // Якщо не знайдено, шукаємо за поштою
         }
         return user;
+    }
+
+    public List<User> getAllUsers() {
+        List<User> usersList = new ArrayList<>();
+        try (FileReader reader = new FileReader(USERS_FILE)) {
+            Gson gson = new Gson();
+            JsonObject data = gson.fromJson(reader, JsonObject.class);
+            JsonObject users = data.getAsJsonObject("users");
+
+            for (String username : users.keySet()) {
+                JsonObject userJson = users.getAsJsonObject(username);
+                String email = userJson.get("email").getAsString();
+                String password = userJson.get("password").getAsString();
+                String role = userJson.get("role").getAsString();
+
+                usersList.add(new User(username, email, password, role));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return usersList;
+    }
+
+    public void deleteUser(String username) {
+        try (FileReader reader = new FileReader(USERS_FILE)) {
+            Gson gson = new Gson();
+            JsonObject data = gson.fromJson(reader, JsonObject.class);
+            JsonObject users = data.getAsJsonObject("users");
+
+            if (users.has(username)) {
+                users.remove(username); // Видаляємо користувача за логіном
+
+                // Створюємо Gson з форматуванням для красивого виведення
+                Gson prettyGson = new GsonBuilder().setPrettyPrinting().create();
+
+                try (FileWriter writer = new FileWriter(USERS_FILE)) {
+                    // Записуємо JSON з форматуванням
+                    prettyGson.toJson(data, writer);
+                }
+            } else {
+                System.out.println("Користувач не знайдений.");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
