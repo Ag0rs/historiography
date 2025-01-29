@@ -1,4 +1,4 @@
-package com.agors.historiography.appui;
+package com.agors.historiography.appui.window;
 
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;

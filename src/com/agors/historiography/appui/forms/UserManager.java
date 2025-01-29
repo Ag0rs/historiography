@@ -1,5 +1,6 @@
-package com.agors.historiography.domain.entitys;
+package com.agors.historiography.appui.forms;
 
+import com.agors.historiography.domain.entity.User;
 import com.agors.historiography.persistence.repository.UserRepository;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;

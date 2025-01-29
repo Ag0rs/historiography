@@ -1,5 +1,6 @@
 package com.agors.historiography.appui;
 
+import com.agors.historiography.appui.forms.MenuHandler;
 import com.agors.historiography.persistence.repository.UserRepository;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;

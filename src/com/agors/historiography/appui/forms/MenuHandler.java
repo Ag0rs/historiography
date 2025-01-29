@@ -1,9 +1,9 @@
-package com.agors.historiography.appui;
+package com.agors.historiography.appui.forms;
 
-import com.agors.historiography.domain.entitys.User;
-import com.agors.historiography.domain.entitys.UserManager;
+import com.agors.historiography.domain.entity.User;
 import com.agors.historiography.domain.message.MessageManager;
 import com.agors.historiography.domain.validations.Validation;
+import com.agors.historiography.persistence.repository.HistoricalPlaceRepository;
 import com.agors.historiography.persistence.repository.UserRepository;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
@@ -489,8 +489,13 @@ public class MenuHandler {
 
         int selectedIndex = 0;
 
-        // Створюємо екземпляр UserManager
+        // Створюємо необхідні екземпляри
         UserManager userManager = new UserManager(userRepository, textGraphics, screen);
+        HistoricalPlaceRepository historicalPlaceRepository = new HistoricalPlaceRepository();
+        AddHistoricalPlaceUI addHistoricalPlaceUI = new AddHistoricalPlaceUI(
+            historicalPlaceRepository, screen);
+        ViewHistoricalPlacesUI viewHistoricalPlacesUI = new ViewHistoricalPlacesUI(
+            historicalPlaceRepository, screen);
 
         while (true) {
             clearScreen();
@@ -504,8 +509,7 @@ public class MenuHandler {
             for (int i = 0; i < adminMenuOptions.length; i++) {
                 if (i == selectedIndex) {
                     textGraphics.setForegroundColor(TextColor.ANSI.GREEN);
-                    textGraphics.putString(8, 5 + i,
-                        "▶ " + adminMenuOptions[i]); // Стрілочка для активного пункту
+                    textGraphics.putString(8, 5 + i, "▶ " + adminMenuOptions[i]); // Стрілочка
                 } else {
                     textGraphics.setForegroundColor(TextColor.ANSI.WHITE);
                     textGraphics.putString(10, 5 + i, adminMenuOptions[i]);
@@ -514,7 +518,7 @@ public class MenuHandler {
 
             screen.refresh();
 
-            // Обробка клавіш
+            // Обробка натискання клавіш
             KeyStroke keyStroke = screen.readInput();
             switch (keyStroke.getKeyType()) {
                 case ArrowDown:
@@ -529,13 +533,13 @@ public class MenuHandler {
                 case Enter:
                     switch (selectedIndex) {
                         case 0: // Управління користувачами
-                            userManager.manageUsers(); // Викликаємо метод manageUsers
+                            userManager.manageUsers();
                             break;
-                        case 1: // Історичні місця
-                            viewHistoricalPlaces();
+                        case 1: // Історичні місця (перегляд списку)
+                            viewHistoricalPlacesUI.show();
                             break;
                         case 2: // Додати історичне місце
-                            addHistoricalPlace();
+                            addHistoricalPlaceUI.show();
                             break;
                         case 3: // Редагувати історичне місце
                             editHistoricalPlace();
@@ -554,16 +558,6 @@ public class MenuHandler {
                     return; // Вихід з меню
             }
         }
-    }
-
-    private void viewHistoricalPlaces() {
-        // TODO: Реалізуйте логіку для перегляду історичних місць
-        System.out.println("Історичні місця - функціонал ще не реалізований.");
-    }
-
-    private void addHistoricalPlace() {
-        // TODO: Реалізуйте логіку для додавання історичного місця
-        System.out.println("Додавання історичного місця - функціонал ще не реалізований.");
     }
 
     private void editHistoricalPlace() {

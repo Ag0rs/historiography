@@ -1,4 +1,4 @@
-package com.agors.historiography.domain.entitys;
+package com.agors.historiography.domain.entity;
 
 public class User {
 

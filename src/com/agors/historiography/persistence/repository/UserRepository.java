@@ -1,6 +1,6 @@
 package com.agors.historiography.persistence.repository;
 
-import com.agors.historiography.domain.entitys.User;
+import com.agors.historiography.domain.entity.User;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
