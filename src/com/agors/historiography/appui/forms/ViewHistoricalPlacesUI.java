@@ -94,7 +94,9 @@ public class ViewHistoricalPlacesUI {
         final int VERTICAL_OFFSET = 5;
 
         textGraphics.setForegroundColor(TextColor.ANSI.CYAN);
-        textGraphics.putString(10, 2, "Детальна інформація:");
+        textGraphics.putString(10, 1, "Детальна інформація");
+        textGraphics.setForegroundColor(ANSI.YELLOW);
+        textGraphics.putString(10, 2, "Натисніть будь-яку клавішу для повернення...");
 
         for (int i = 0; i < fields.length; i++) {
             textGraphics.setForegroundColor(TextColor.ANSI.WHITE);
@@ -120,10 +122,6 @@ public class ViewHistoricalPlacesUI {
                 yOffset++;
             }
         }
-
-        textGraphics.setForegroundColor(TextColor.ANSI.YELLOW);
-        textGraphics.putString(10, fields.length * VERTICAL_OFFSET + 8,
-            "Натисніть будь-яку клавішу для повернення...");
 
         screen.refresh();
         screen.readInput(); // Очікуємо натискання клавіші перед виходом

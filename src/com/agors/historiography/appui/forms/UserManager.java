@@ -3,6 +3,7 @@ package com.agors.historiography.appui.forms;
 import com.agors.historiography.domain.entity.User;
 import com.agors.historiography.persistence.repository.UserRepository;
 import com.googlecode.lanterna.TextColor;
+import com.googlecode.lanterna.TextColor.ANSI;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.screen.Screen;
@@ -56,10 +57,10 @@ public class UserManager {
             }
 
             // Виведення фіксованого тексту внизу
-            textGraphics.setForegroundColor(TextColor.ANSI.WHITE);
+            textGraphics.setForegroundColor(ANSI.YELLOW);
             textGraphics.putString(10, USERS_PER_PAGE + 7,
-                "Натисніть Enter для видалення користувача, або ESC для виходу.");
-            textGraphics.putString(10, USERS_PER_PAGE + 8, "Натисніть Up/Down для прокрутки.");
+                "Натисніть Enter для видалення користувача, або ESC для виходу");
+            textGraphics.putString(10, USERS_PER_PAGE + 8, "↑ Вгору   ↓ Вниз");
             screen.refresh();
 
             // Обробка натискання клавіші

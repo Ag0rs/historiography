@@ -42,7 +42,8 @@ public class HistoricalPlaceRepository {
         }
     }
 
-    private void saveHistoricalPlaces() {
+    // Змінено з private на public
+    public void saveHistoricalPlaces() {
         try (Writer writer = new FileWriter(FILE_NAME)) {
             gson.toJson(historicalPlaces, writer);
         } catch (IOException e) {

@@ -475,7 +475,7 @@ public class MenuHandler {
         }
     }
 
-    private void showAdminMenu() throws IOException {
+    public void showAdminMenu() throws IOException { // <-- Було private, стало public
         clearScreen();
 
         String[] adminMenuOptions = {
@@ -489,27 +489,25 @@ public class MenuHandler {
 
         int selectedIndex = 0;
 
-        // Створюємо необхідні екземпляри
         UserManager userManager = new UserManager(userRepository, textGraphics, screen);
         HistoricalPlaceRepository historicalPlaceRepository = new HistoricalPlaceRepository();
         AddHistoricalPlaceUI addHistoricalPlaceUI = new AddHistoricalPlaceUI(
             historicalPlaceRepository, screen);
         ViewHistoricalPlacesUI viewHistoricalPlacesUI = new ViewHistoricalPlacesUI(
             historicalPlaceRepository, screen);
+        EditHistoricalPlaceUI editHistoricalPlaceUI = new EditHistoricalPlaceUI(
+            historicalPlaceRepository, screen, this); // <-- Передаємо MenuHandler
 
         while (true) {
             clearScreen();
-
-            // Заголовок меню
             textGraphics.setForegroundColor(TextColor.ANSI.CYAN);
             textGraphics.putString(10, 2, "Меню адміністратора");
             textGraphics.putString(10, 3, "────────────────────");
 
-            // Відображення пунктів меню
             for (int i = 0; i < adminMenuOptions.length; i++) {
                 if (i == selectedIndex) {
                     textGraphics.setForegroundColor(TextColor.ANSI.GREEN);
-                    textGraphics.putString(8, 5 + i, "▶ " + adminMenuOptions[i]); // Стрілочка
+                    textGraphics.putString(8, 5 + i, "▶ " + adminMenuOptions[i]);
                 } else {
                     textGraphics.setForegroundColor(TextColor.ANSI.WHITE);
                     textGraphics.putString(10, 5 + i, adminMenuOptions[i]);
@@ -518,51 +516,42 @@ public class MenuHandler {
 
             screen.refresh();
 
-            // Обробка натискання клавіш
             KeyStroke keyStroke = screen.readInput();
             switch (keyStroke.getKeyType()) {
                 case ArrowDown:
                     selectedIndex = (selectedIndex + 1) % adminMenuOptions.length;
                     break;
-
                 case ArrowUp:
                     selectedIndex =
                         (selectedIndex - 1 + adminMenuOptions.length) % adminMenuOptions.length;
                     break;
-
                 case Enter:
                     switch (selectedIndex) {
-                        case 0: // Управління користувачами
+                        case 0:
                             userManager.manageUsers();
                             break;
-                        case 1: // Історичні місця (перегляд списку)
+                        case 1:
                             viewHistoricalPlacesUI.show();
                             break;
-                        case 2: // Додати історичне місце
+                        case 2:
                             addHistoricalPlaceUI.show();
                             break;
-                        case 3: // Редагувати історичне місце
-                            editHistoricalPlace();
+                        case 3:
+                            editHistoricalPlaceUI.show();
                             break;
-                        case 4: // Вихід з акаунта
+                        case 4:
                             showLoginWindow();
                             return;
-                        case 5: // Вихід з програми
+                        case 5:
                             screen.stopScreen();
                             System.exit(0);
                             break;
                     }
                     break;
-
                 case Escape:
-                    return; // Вихід з меню
+                    return;
             }
         }
-    }
-
-    private void editHistoricalPlace() {
-        // TODO: Реалізуйте логіку для редагування історичного місця
-        System.out.println("Редагування історичного місця - функціонал ще не реалізований.");
     }
 
     private void showUserMenu() throws IOException {
