@@ -110,13 +110,23 @@ public class AddHistoricalPlaceUI {
                             HistoricalPlace place = new HistoricalPlace(id, inputs[0], inputs[1],
                                 inputs[2], inputs[3]);
                             repository.addHistoricalPlace(place);
+
+                            // Задаємо колір тексту на зелений
+                            textGraphics.setForegroundColor(TextColor.ANSI.GREEN);
+
+                            // Виводимо повідомлення
                             textGraphics.putString(25, 22, "Місце успішно додано!");
+
+                            // Оновлюємо екран
                             screen.refresh();
+
+                            // Затримка для демонстрації повідомлення
                             try {
                                 Thread.sleep(2000);
                             } catch (InterruptedException e) {
                                 Thread.currentThread().interrupt();
                             }
+
                             return;
                         }
                     } else if (selectedFieldIndex == fields.length + 1) {

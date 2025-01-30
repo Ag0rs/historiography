@@ -2,11 +2,13 @@ package com.agors.historiography.appui.forms;
 
 import com.agors.historiography.domain.entity.User;
 import com.agors.historiography.domain.message.MessageManager;
+import com.agors.historiography.domain.validations.Utils;
 import com.agors.historiography.domain.validations.Validation;
 import com.agors.historiography.persistence.repository.HistoricalPlaceRepository;
 import com.agors.historiography.persistence.repository.ReviewRepository;
 import com.agors.historiography.persistence.repository.UserRepository;
 import com.googlecode.lanterna.TextColor;
+import com.googlecode.lanterna.TextColor.ANSI;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.screen.Screen;
@@ -54,7 +56,10 @@ public class MenuHandler {
 
         while (true) {
             clearScreen();
+
+            // Виведення меню з візуальним оформленням
             for (int i = 0; i < menuOptions.length; i++) {
+                // Встановлюємо колір для вибраного пункту меню
                 if (i == selectedIndex) {
                     textGraphics.setForegroundColor(TextColor.ANSI.GREEN);
                     textGraphics.putString(8, 5 + i,
@@ -64,8 +69,16 @@ public class MenuHandler {
                     textGraphics.putString(10, 5 + i, menuOptions[i]);
                 }
             }
+
+            // Декоративні рамки навколо меню
+            textGraphics.setForegroundColor(ANSI.WHITE);
+            textGraphics.putString(6, 3, "╔══════════════════════════╗");
+            textGraphics.putString(6, 4, "║       Головне меню       ║");
+            textGraphics.putString(6, 7 + menuOptions.length, "╚══════════════════════════╝");
+
             screen.refresh();
 
+            // Обробка натискання клавіші
             KeyStroke keyStroke = screen.readInput();
             switch (keyStroke.getKeyType()) {
                 case ArrowDown:
@@ -192,8 +205,11 @@ public class MenuHandler {
                                 // Очищаємо повідомлення про помилку перед виведенням успіху
                                 messageManager.clearMessages();
 
+                                // Хешуємо пароль перед збереженням
+                                String hashedPassword = Utils.hashPassword(inputs[2]);
+
                                 // Реєстрація успішна
-                                User user = new User(inputs[0], inputs[1], inputs[2],
+                                User user = new User(inputs[0], inputs[1], hashedPassword,
                                     roles[selectedRoleIndex]);
                                 userRepository.addUser(user);
 
@@ -231,6 +247,10 @@ public class MenuHandler {
                         }
                     }
                     break;
+
+                case Escape: // Вихід при натисканні Esc
+                    showMainMenu();
+                    return;
 
                 default:
                     if (keyStroke.getCharacter() != null && selectedFieldIndex >= 0
@@ -323,7 +343,7 @@ public class MenuHandler {
 
                             // Перевірка, чи користувач існує та чи правильний пароль
                             if (loggedInUser != null && loggedInUser.getPassword()
-                                .equals(inputs[1])) {
+                                .equals(Utils.hashPassword(inputs[1]))) {
                                 messageManager.clearMessages();
                                 messageManager.setSuccessMessage("Успішний вхід! Ласкаво просимо!");
                                 messageManager.displayMessages(textGraphics);
@@ -362,6 +382,10 @@ public class MenuHandler {
                         }
                     }
                     break;
+
+                case Escape:
+                    showMainMenu(); // Вихід при натисканні ESC
+                    return;
 
                 default:
                     if (keyStroke.getCharacter() != null && selectedFieldIndex >= 0

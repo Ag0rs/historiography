@@ -63,7 +63,7 @@ public class ViewHistoricalPlacesUI {
             // Виведення фіксованого тексту внизу екрану
             textGraphics.setForegroundColor(TextColor.ANSI.YELLOW);
             textGraphics.putString(10, PLACES_PER_PAGE + 6,
-                "↑ Вгору   ↓ Вниз   Enter - Переглянути   Esc - Вихід   s - Пошук");
+                "↑ Вгору   ↓ Вниз   Enter - Переглянути   Esc - Вихід   с/і - Пошук");
 
             screen.refresh();
             KeyStroke keyStroke = screen.readInput();
@@ -95,7 +95,8 @@ public class ViewHistoricalPlacesUI {
                     return; // Вихід з меню
 
                 case Character:
-                    if (keyStroke.getCharacter() == 's' || keyStroke.getCharacter() == 'i') {
+                    if (keyStroke.getCharacter() == 'с' || keyStroke.getCharacter() == 'і'
+                        || keyStroke.getCharacter() == 's') {
                         searchPlaces(places);
                     }
                     break;

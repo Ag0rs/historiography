@@ -1,83 +1,13 @@
 {
   "users": {
-    "cdscdsdcs": {
-      "email": "dcscdsds@dcdcs.cds",
-      "password": "q2wedsfcd",
-      "role": "Admin"
-    },
-    "cdsdcs": {
-      "email": "dcscdscsd@dsc.cds",
-      "password": "sdcscdcds",
-      "role": "Admin"
-    },
-    "sdsdadq": {
-      "email": "wdeewfe@ds.wde",
-      "password": "fewewew",
-      "role": "Admin"
-    },
-    "dewedwdew": {
-      "email": "ewddewdew@de.dcs",
-      "password": "ewdewdsc",
-      "role": "User"
-    },
-    "fewfewwef": {
-      "email": "fewfwe@ewf.few",
-      "password": "efwefwfe",
-      "role": "User"
-    },
-    "fwfwewef": {
-      "email": "wfewe@efw.wfwe",
-      "password": "fwefwewfe",
-      "role": "User"
-    },
-    "wfewfe": {
-      "email": "wfe@ewfwe.few",
-      "password": "wefwefwfe",
-      "role": "Admin"
-    },
-    "fwewefe": {
-      "email": "wefwfe@ew.few",
-      "password": "fwefewfwe",
-      "role": "User"
-    },
-    "fwewfewfe": {
-      "email": "wfewfefew@ewf.fwefwe",
-      "password": "fweweffewfew",
-      "role": "User"
-    },
-    "fewewffew": {
-      "email": "wfewwf@wfefwe.few",
-      "password": "fwefewfwe",
-      "role": "Admin"
-    },
-    "csdsd": {
-      "email": "cdscsd@dcdsc.dcscds",
-      "password": "cdscdscds",
-      "role": "User"
-    },
-    "cdscdscds": {
-      "email": "cdsdcsdcs@dcsdc.cds",
-      "password": "cdscdsdcsdcs",
-      "role": "User"
-    },
-    "cdscdscdsds": {
-      "email": "dsccds@dcs.cdscds",
-      "password": "cdscdscdsdcs",
-      "role": "User"
-    },
     "admin": {
       "email": "admin@gmail.com",
-      "password": "123456",
+      "password": "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92",
       "role": "Admin"
-    },
-    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa": {
-      "email": "aaaaaaaaaaaaaaaaaa@aaaaaaa.aaa",
-      "password": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-      "role": "User"
     },
     "user": {
       "email": "user@gmail.com",
-      "password": "123456",
+      "password": "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92",
       "role": "User"
     }
   }

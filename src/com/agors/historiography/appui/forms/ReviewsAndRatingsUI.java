@@ -90,32 +90,76 @@ public class ReviewsAndRatingsUI {
     }
 
     private void viewReviews() throws IOException {
-        screen.clear();
-        TextGraphics textGraphics = screen.newTextGraphics();
-        textGraphics.setForegroundColor(TextColor.ANSI.CYAN);
-        textGraphics.putString(10, 2, "Перегляд відгуків");
-
         List<Review> reviews = reviewRepository.getReviews();
+        int selectedIndex = 0;
+        int pageStartIndex = 0;
+        final int REVIEWS_PER_PAGE = 5; // Кількість відгуків на одній сторінці
 
         if (reviews.isEmpty()) {
+            screen.clear();
+            TextGraphics textGraphics = screen.newTextGraphics();
             textGraphics.setForegroundColor(TextColor.ANSI.RED);
-            textGraphics.putString(10, 4, "Немає відгуків.");
-        } else {
-            textGraphics.setForegroundColor(TextColor.ANSI.WHITE);
-            int y = 4;
-            for (Review review : reviews) {
-                String reviewText = String.format(
-                    "%s (Рейтинг: %d) - %s",
-                    review.getPlaceName(),
-                    review.getRating(),
-                    review.getText()
-                );
-                textGraphics.putString(10, y++, reviewText);
-            }
+            textGraphics.putString(10, 5, "Немає відгуків.");
+            screen.refresh();
+            screen.readInput();
+            return;
         }
 
-        screen.refresh();
-        screen.readInput();
+        while (true) {
+            screen.clear();
+            TextGraphics textGraphics = screen.newTextGraphics();
+            textGraphics.setForegroundColor(TextColor.ANSI.CYAN);
+            textGraphics.putString(5, 2, "Перегляд відгуків");
+
+            int yPosition = 5;
+            int pageEndIndex = Math.min(pageStartIndex + REVIEWS_PER_PAGE, reviews.size());
+
+            for (int i = pageStartIndex; i < pageEndIndex; i++) {
+                Review review = reviews.get(i);
+
+                textGraphics.setForegroundColor(
+                    i == selectedIndex ? TextColor.ANSI.GREEN : TextColor.ANSI.WHITE);
+
+                // Виведення назви місця
+                textGraphics.putString(10, yPosition, "Місце: " + review.getPlaceName());
+                // Виведення рейтингу
+                textGraphics.putString(50, yPosition, "Рейтинг: " + review.getRating());
+
+                yPosition++;
+                // Виведення тексту відгуку
+                textGraphics.putString(10, yPosition, "Відгук: " + review.getText());
+                yPosition += 2;
+            }
+
+            textGraphics.setForegroundColor(TextColor.ANSI.YELLOW);
+            textGraphics.putString(10, REVIEWS_PER_PAGE * 2 + 11, "↑ Вгору   ↓ Вниз   Esc - Вихід");
+            screen.refresh();
+
+            KeyStroke keyStroke = screen.readInput();
+
+            switch (keyStroke.getKeyType()) {
+                case ArrowDown:
+                    if (selectedIndex < reviews.size() - 1) {
+                        selectedIndex++;
+                        if (selectedIndex >= pageStartIndex + REVIEWS_PER_PAGE) {
+                            pageStartIndex++;
+                        }
+                    }
+                    break;
+
+                case ArrowUp:
+                    if (selectedIndex > 0) {
+                        selectedIndex--;
+                        if (selectedIndex < pageStartIndex) {
+                            pageStartIndex--;
+                        }
+                    }
+                    break;
+
+                case Escape:
+                    return;
+            }
+        }
     }
 
     private void addReview() throws IOException {
@@ -241,8 +285,9 @@ public class ReviewsAndRatingsUI {
             textGraphics.setForegroundColor(TextColor.ANSI.CYAN);
             textGraphics.putString(10, 2, "Відгук для: " + selectedPlace.getName());
 
-            // Введення тексту відгуку
-            textGraphics.setForegroundColor(TextColor.ANSI.YELLOW);
+            // Підсвітка рядка для введення тексту відгуку
+            textGraphics.setForegroundColor(
+                selectedField == 0 ? TextColor.ANSI.GREEN : TextColor.ANSI.YELLOW);
             textGraphics.putString(10, 4, "Введіть текст відгуку:");
 
             // Підсвітка текстового поля для відгуку
@@ -250,8 +295,9 @@ public class ReviewsAndRatingsUI {
                 selectedField == 0 ? TextColor.ANSI.GREEN : TextColor.ANSI.WHITE);
             textGraphics.putString(10, 6, reviewText.toString());  // Виводимо текст відгуку
 
-            // Введення оцінки
-            textGraphics.setForegroundColor(TextColor.ANSI.YELLOW);
+            // Підсвітка рядка для введення оцінки
+            textGraphics.setForegroundColor(
+                selectedField == 1 ? TextColor.ANSI.GREEN : TextColor.ANSI.YELLOW);
             textGraphics.putString(10, 10, "Введіть оцінку від 0 до 9:");
 
             // Підсвітка текстового поля для оцінки
@@ -276,30 +322,27 @@ public class ReviewsAndRatingsUI {
 
             // Обробка вводу для тексту відгуку
             if (selectedField == 0) {
-                if (keyStroke.getCharacter() != null) {
+                if (keyStroke.getKeyType() == KeyType.Backspace && reviewText.length() > 0) {
+                    reviewText.deleteCharAt(
+                        reviewText.length() - 1);  // Видалення останнього символу
+                } else if (keyStroke.getCharacter() != null) {
                     char c = keyStroke.getCharacter();
                     if (!Character.isISOControl(c) && reviewText.length() < 50) {
                         reviewText.append(c);  // Додаємо символ до тексту відгуку
-                    }
-                } else if (keyStroke.getKeyType() == KeyType.Backspace) {
-                    // Перевірка наявності символів для видалення
-                    if (reviewText.length() > 0) {
-                        reviewText.deleteCharAt(
-                            reviewText.length() - 1);  // Видаляємо останній символ
                     }
                 }
             }
 
             // Обробка вводу для оцінки
             if (selectedField == 1) {
-                if (keyStroke.getCharacter() != null && Character.isDigit(
+                if (keyStroke.getKeyType() == KeyType.Backspace) {
+                    rating = -1;  // Видалення оцінки
+                } else if (keyStroke.getCharacter() != null && Character.isDigit(
                     keyStroke.getCharacter())) {
-                    rating = Character.getNumericValue(keyStroke.getCharacter());
-                    if (rating < 0 || rating > 9) {
-                        rating = -1;  // Якщо оцінка не в межах допустимих значень
+                    int tempRating = Character.getNumericValue(keyStroke.getCharacter());
+                    if (tempRating >= 0 && tempRating <= 9) {
+                        rating = tempRating;  // Збереження коректної оцінки
                     }
-                } else if (keyStroke.getKeyType() == KeyType.Backspace && rating != -1) {
-                    rating = -1;  // Скидаємо оцінку
                 }
             }
 

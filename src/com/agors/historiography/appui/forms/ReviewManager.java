@@ -12,7 +12,7 @@ import java.util.List;
 
 public class ReviewManager {
 
-    private static final int REVIEWS_PER_PAGE = 10; // максимальна кількість відгуків на сторінці
+    private static final int REVIEWS_PER_PAGE = 5; // Зменшено кількість відгуків на сторінці
     private final ReviewRepository reviewRepository;
     private final TextGraphics textGraphics;
     private final Screen screen;
@@ -43,7 +43,7 @@ public class ReviewManager {
         // Основний цикл для управління відгуками
         while (true) {
             clearScreen();
-            int yPosition = 5; // Початкова вертикальна позиція для відображення відгуків
+            int yPosition = 3; // Початкова вертикальна позиція для відображення відгуків
             int pageEndIndex = Math.min(pageStartIndex + REVIEWS_PER_PAGE, reviews.size());
 
             // Виведення відгуків вертикально
@@ -62,16 +62,20 @@ public class ReviewManager {
                 textGraphics.putString(50, yPosition, "Рейтинг: " + review.getRating());
                 // Виведення тексту відгуку
                 yPosition++;
-                textGraphics.putString(10, yPosition, "Відгук: " + review.getText());
+                String reviewText = review.getText();
+                if (reviewText.length() > 50) { // Скорочення тексту до 50 символів
+                    reviewText = reviewText.substring(0, 50) + "...";
+                }
+                textGraphics.putString(10, yPosition, "Відгук: " + reviewText);
 
                 yPosition++; // Переміщаємося вниз на наступний рядок
             }
 
             // Виведення фіксованого тексту внизу
             textGraphics.setForegroundColor(ANSI.YELLOW);
-            textGraphics.putString(10, REVIEWS_PER_PAGE + 7,
+            textGraphics.putString(10, REVIEWS_PER_PAGE + 10,
                 "Натисніть Enter для видалення відгуку, або ESC для виходу");
-            textGraphics.putString(10, REVIEWS_PER_PAGE + 8, "↑ Вгору   ↓ Вниз");
+            textGraphics.putString(10, REVIEWS_PER_PAGE + 11, "↑ Вгору   ↓ Вниз");
             screen.refresh();
 
             // Обробка натискання клавіші
