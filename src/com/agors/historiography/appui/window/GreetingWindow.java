@@ -5,16 +5,31 @@ import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.screen.Screen;
 import java.io.IOException;
 
+/**
+ * Клас, що відповідає за виведення вітання в графічному інтерфейсі користувача. Виводить
+ * повідомлення на екран і чекає на натискання клавіші для продовження.
+ */
 public class GreetingWindow {
 
     private final Screen screen;
     private final TextGraphics textGraphics;
 
+    /**
+     * Конструктор класу, ініціалізує екран та графічні налаштування.
+     *
+     * @param screen екран, на якому буде виведено вітання
+     */
     public GreetingWindow(Screen screen) {
         this.screen = screen;
         this.textGraphics = screen.newTextGraphics();
     }
 
+    /**
+     * Виводить вітальне повідомлення на екран по буквах. Після виведення основного повідомлення
+     * чекає натискання клавіші для продовження.
+     *
+     * @throws IOException якщо виникне помилка при роботі з екраном
+     */
     public void showGreeting() throws IOException {
         try {
             clearScreen();
@@ -22,12 +37,12 @@ public class GreetingWindow {
             int xPos = 10;
             int yPos = 5;
 
-            // Виводимо текст по буквах
+            // Виведення кожної букви окремо
             for (int i = 0; i < message.length(); i++) {
                 textGraphics.setForegroundColor(TextColor.ANSI.CYAN);
                 textGraphics.putString(xPos + i, yPos, String.valueOf(message.charAt(i)));
                 screen.refresh();
-                Thread.sleep(100); // Затримка між виведенням кожної літери
+                Thread.sleep(100);
             }
 
             textGraphics.setForegroundColor(TextColor.ANSI.WHITE);
@@ -35,13 +50,18 @@ public class GreetingWindow {
             textGraphics.putString(xPos, yPos + 2, continueMessage);
             screen.refresh();
 
-            screen.readInput(); // Очікуємо натискання клавіші
+            screen.readInput();
 
         } catch (InterruptedException e) {
-            Thread.currentThread().interrupt(); // Відновлюємо статус переривання
+            Thread.currentThread().interrupt();
         }
     }
 
+    /**
+     * Очищає екран та оновлює його.
+     *
+     * @throws IOException якщо виникне помилка при очищенні екрану
+     */
     private void clearScreen() throws IOException {
         screen.clear();
         screen.refresh();

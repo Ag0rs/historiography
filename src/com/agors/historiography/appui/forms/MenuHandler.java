@@ -14,6 +14,10 @@ import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.screen.Screen;
 import java.io.IOException;
 
+/**
+ * Клас, що обробляє взаємодію користувача з головним меню програми. Відповідає за виведення
+ * вітального екрану, головного меню та обробку введених даних для реєстрації користувача.
+ */
 public class MenuHandler {
 
     private final Screen screen;
@@ -21,24 +25,38 @@ public class MenuHandler {
     private final UserRepository userRepository;
     private final MessageManager messageManager;
 
+    /**
+     * Конструктор класу.
+     *
+     * @param screen         екран, на якому виводяться елементи інтерфейсу
+     * @param textGraphics   об'єкт для малювання тексту на екрані
+     * @param userRepository репозиторій для роботи з користувачами
+     */
     public MenuHandler(Screen screen, TextGraphics textGraphics, UserRepository userRepository) {
         this.screen = screen;
         this.textGraphics = textGraphics;
         this.userRepository = userRepository;
-        this.messageManager = new MessageManager(); // ініціалізуємо менеджер повідомлень
+        this.messageManager = new MessageManager();
     }
 
+    /**
+     * Виводить вітальне повідомлення на екран.
+     *
+     * @throws IOException          якщо виникає помилка при роботі з екраном
+     * @throws InterruptedException якщо потік був перерваний під час виведення
+     */
     public void showGreeting() throws IOException, InterruptedException {
         clearScreen();
         String message = "Вітаємо в програмі Historiography!";
         int xPos = 10;
         int yPos = 5;
 
+        // Виведення тексту по символах з затримкою
         for (int i = 0; i < message.length(); i++) {
             textGraphics.setForegroundColor(TextColor.ANSI.CYAN);
             textGraphics.putString(xPos + i, yPos, String.valueOf(message.charAt(i)));
             screen.refresh();
-            Thread.sleep(100); // Затримка між виведенням кожної літери
+            Thread.sleep(100);
         }
 
         textGraphics.setForegroundColor(TextColor.ANSI.WHITE);
@@ -46,31 +64,34 @@ public class MenuHandler {
         textGraphics.putString(xPos, yPos + 2, continueMessage);
         screen.refresh();
 
-        screen.readInput(); // Очікуємо натискання клавіші
+        screen.readInput();
     }
 
+    /**
+     * Виводить головне меню та обробляє вибір пунктів меню.
+     *
+     * @throws IOException якщо виникає помилка при роботі з екраном
+     */
     public void showMainMenu() throws IOException {
         messageManager.clearMessages();
         String[] menuOptions = {"Реєстрація", "Вхід", "Правила", "Вихід"};
         int selectedIndex = 0;
 
+        // Основний цикл меню
         while (true) {
             clearScreen();
 
-            // Виведення меню з візуальним оформленням
+            // Виведення пунктів меню
             for (int i = 0; i < menuOptions.length; i++) {
-                // Встановлюємо колір для вибраного пункту меню
                 if (i == selectedIndex) {
                     textGraphics.setForegroundColor(TextColor.ANSI.GREEN);
-                    textGraphics.putString(8, 5 + i,
-                        "▶ " + menuOptions[i]); // Стрілочка для активного пункту
+                    textGraphics.putString(8, 5 + i, "▶ " + menuOptions[i]);
                 } else {
                     textGraphics.setForegroundColor(TextColor.ANSI.WHITE);
                     textGraphics.putString(10, 5 + i, menuOptions[i]);
                 }
             }
 
-            // Декоративні рамки навколо меню
             textGraphics.setForegroundColor(ANSI.WHITE);
             textGraphics.putString(6, 3, "╔══════════════════════════╗");
             textGraphics.putString(6, 4, "║       Головне меню       ║");
@@ -78,7 +99,6 @@ public class MenuHandler {
 
             screen.refresh();
 
-            // Обробка натискання клавіші
             KeyStroke keyStroke = screen.readInput();
             switch (keyStroke.getKeyType()) {
                 case ArrowDown:
@@ -91,7 +111,7 @@ public class MenuHandler {
                     if (menuOptions[selectedIndex].equals("Реєстрація")) {
                         showRegistrationWindow();
                     } else if (menuOptions[selectedIndex].equals("Вхід")) {
-                        showLoginWindow(); // Перехід до входу
+                        showLoginWindow();
                     } else if (menuOptions[selectedIndex].equals("Правила")) {
                         showRegistrationRules();
                     } else if (menuOptions[selectedIndex].equals("Вихід")) {
@@ -103,24 +123,30 @@ public class MenuHandler {
         }
     }
 
+    /**
+     * Виводить форму для реєстрації нового користувача.
+     *
+     * @throws IOException якщо виникає помилка при роботі з екраном
+     */
     private void showRegistrationWindow() throws IOException {
         clearScreen();
 
         String[] fields = {"Логін", "Пошта", "Пароль", "Роль"};
-        String[] inputs = {"", "", "", "User"}; // За замовчуванням роль — User
+        String[] inputs = {"", "", "", "User"};
         int selectedFieldIndex = 0;
 
         final int MAX_INPUT_LENGTH = 30;
 
-        String[] roles = {"User", "Admin"}; // Доступні ролі
+        String[] roles = {"User", "Admin"};
         int selectedRoleIndex = 0;
 
         String[] buttons = {"Зареєструватися", "Вихід"};
 
+        // Цикл введення даних для реєстрації
         while (true) {
             clearScreen();
 
-            // Виведення полів вводу
+            // Виведення полів для введення
             for (int i = 0; i < fields.length; i++) {
                 textGraphics.setForegroundColor(TextColor.ANSI.WHITE);
                 textGraphics.putString(8, 2 + i * 4, "┌───────────────────────────────────────┐");
@@ -139,7 +165,7 @@ public class MenuHandler {
                         (inputs[i].length() > MAX_INPUT_LENGTH ? inputs[i].substring(0,
                             MAX_INPUT_LENGTH) : inputs[i]);
                     textGraphics.putString(17, 3 + i * 4, inputToShow);
-                } else { // Поле для вибору ролі
+                } else {
                     textGraphics.putString(17, 3 + i * 4, roles[selectedRoleIndex]);
                 }
             }
@@ -154,7 +180,6 @@ public class MenuHandler {
                 textGraphics.putString(10, 19 + i, buttons[i]);
             }
 
-            // Виведення повідомлень про помилку чи успіх
             messageManager.displayMessagesReg(textGraphics);
 
             screen.refresh();
@@ -176,53 +201,46 @@ public class MenuHandler {
                     break;
 
                 case ArrowLeft:
-                    if (selectedFieldIndex == 3) { // Зміна ролі
+                    if (selectedFieldIndex == 3) {
                         selectedRoleIndex = (selectedRoleIndex - 1 + roles.length) % roles.length;
                     }
                     break;
 
                 case ArrowRight:
-                    if (selectedFieldIndex == 3) { // Зміна ролі
+                    if (selectedFieldIndex == 3) {
                         selectedRoleIndex = (selectedRoleIndex + 1) % roles.length;
                     }
                     break;
 
                 case Enter:
                     if (selectedFieldIndex == fields.length) {
-                        // Перевірка на порожні поля
                         if (inputs[0].isEmpty() || inputs[1].isEmpty() || inputs[2].isEmpty()) {
                             messageManager.setErrorMessage("Будь ласка, заповніть всі поля.");
                         } else if (Validation.isValidUsername(inputs[0]) &&
                             Validation.isValidEmail(inputs[1]) &&
                             Validation.isValidPassword(inputs[2])) {
 
-                            // Перевірка на унікальність логіна та пошти
                             if (userRepository.isUsernameTaken(inputs[0])) {
                                 messageManager.setErrorMessage("Логін вже зайнятий.");
                             } else if (userRepository.isEmailTaken(inputs[1])) {
                                 messageManager.setErrorMessage("Пошта вже зареєстрована.");
                             } else {
-                                // Очищаємо повідомлення про помилку перед виведенням успіху
                                 messageManager.clearMessages();
 
-                                // Хешуємо пароль перед збереженням
                                 String hashedPassword = Utils.hashPassword(inputs[2]);
 
-                                // Реєстрація успішна
                                 User user = new User(inputs[0], inputs[1], hashedPassword,
                                     roles[selectedRoleIndex]);
                                 userRepository.addUser(user);
 
-                                // Встановлюємо успішне повідомлення
                                 messageManager.setSuccessMessage2("Реєстрація успішна!");
 
-                                // Виводимо успішні повідомлення
                                 messageManager.displayMessagesReg(textGraphics);
 
                                 screen.refresh();
 
                                 try {
-                                    Thread.sleep(2000); // Затримка на 2 секунди
+                                    Thread.sleep(2000);
                                 } catch (InterruptedException e) {
                                     Thread.currentThread().interrupt();
                                     System.out.println("Thread was interrupted: " + e.getMessage());
@@ -248,7 +266,7 @@ public class MenuHandler {
                     }
                     break;
 
-                case Escape: // Вихід при натисканні Esc
+                case Escape:
                     showMainMenu();
                     return;
 
@@ -264,6 +282,14 @@ public class MenuHandler {
         }
     }
 
+    /**
+     * Відображає вікно для входу користувача в систему, де він може ввести логін/пошту та пароль.
+     * Після натискання кнопки "Увійти", перевіряється правильність введених даних. Якщо дані
+     * правильні, користувач переходить на головне меню або панель адміністратора, в залежності від
+     * ролі користувача.
+     *
+     * @throws IOException Якщо виникає помилка при вводу/виведенні з екрану.
+     */
     private void showLoginWindow() throws IOException {
         clearScreen();
 
@@ -271,7 +297,7 @@ public class MenuHandler {
         String[] inputs = {"", ""};
         int selectedFieldIndex = 0;
 
-        messageManager.clearMessages(); // Очищаємо повідомлення перед кожним введенням
+        messageManager.clearMessages();
 
         final int MAX_INPUT_LENGTH = 30;
         String[] buttons = {"Увійти", "Вихід"};
@@ -279,7 +305,6 @@ public class MenuHandler {
         while (true) {
             clearScreen();
 
-            // Виведення полів для введення
             for (int i = 0; i < fields.length; i++) {
                 textGraphics.setForegroundColor(TextColor.ANSI.WHITE);
                 textGraphics.putString(8, 4 + i * 4,
@@ -302,7 +327,6 @@ public class MenuHandler {
                 textGraphics.putString(22, 5 + i * 4, inputToShow);
             }
 
-            // Виведення кнопок
             for (int i = 0; i < buttons.length; i++) {
                 if (i == selectedFieldIndex - fields.length) {
                     textGraphics.setForegroundColor(TextColor.ANSI.GREEN);
@@ -312,7 +336,6 @@ public class MenuHandler {
                 textGraphics.putString(10, 13 + i, buttons[i]);
             }
 
-            // Виведення повідомлень про помилки чи успіх
             messageManager.displayMessages(textGraphics);
 
             screen.refresh();
@@ -334,34 +357,29 @@ public class MenuHandler {
 
                 case Enter:
                     if (selectedFieldIndex == fields.length) {
-                        // Перевірка на заповненість полів
                         if (inputs[0].isEmpty() || inputs[1].isEmpty()) {
                             messageManager.setErrorMessage("Будь ласка, заповніть всі поля.");
                         } else {
-                            // Перевірка користувача за логіном або поштою
                             User loggedInUser = userRepository.getUserByUsernameOrEmail(inputs[0]);
 
-                            // Перевірка, чи користувач існує та чи правильний пароль
                             if (loggedInUser != null && loggedInUser.getPassword()
                                 .equals(Utils.hashPassword(inputs[1]))) {
                                 messageManager.clearMessages();
                                 messageManager.setSuccessMessage("Успішний вхід! Ласкаво просимо!");
                                 messageManager.displayMessages(textGraphics);
-                                screen.refresh(); // Оновлення екрану після повідомлення
+                                screen.refresh();
 
                                 try {
-                                    Thread.sleep(1000); // Очікуємо 1 секунду
+                                    Thread.sleep(1000);
                                 } catch (InterruptedException e) {
                                     Thread.currentThread().interrupt();
                                     System.out.println("Thread was interrupted: " + e.getMessage());
                                 }
 
-                                // Перевірка ролі користувача
                                 if ("Admin".equals(loggedInUser.getRole())) {
-                                    // Запитуємо ключ для входу в адмін-меню
-                                    showAdminKeyInputWindow(); // Показуємо вікно для введення ключа
+                                    showAdminKeyInputWindow();
                                 } else {
-                                    showUserMenu();  // Показуємо меню користувача
+                                    showUserMenu();
                                 }
                                 return;
                             } else {
@@ -369,7 +387,7 @@ public class MenuHandler {
                             }
                         }
                     } else if (selectedFieldIndex == fields.length + 1) {
-                        showMainMenu(); // Якщо натиснуто "Вихід"
+                        showMainMenu();
                         return;
                     }
                     break;
@@ -384,7 +402,7 @@ public class MenuHandler {
                     break;
 
                 case Escape:
-                    showMainMenu(); // Вихід при натисканні ESC
+                    showMainMenu();
                     return;
 
                 default:
@@ -399,6 +417,13 @@ public class MenuHandler {
         }
     }
 
+    /**
+     * Відображає вікно для введення ключа адміністратора. Якщо введений правильний ключ, користувач
+     * переходить до меню адміністратора, інакше з'являється повідомлення про помилку. Також
+     * надається можливість повернутися до екрану входу.
+     *
+     * @throws IOException Якщо виникає помилка при вводу/виведенні з екрану.
+     */
     private void showAdminKeyInputWindow() throws IOException {
         clearScreen();
 
@@ -409,12 +434,11 @@ public class MenuHandler {
         final int MAX_INPUT_LENGTH = 30;
         String[] buttons = {"Вхід", "Вихід"};
 
-        String errorMessage = ""; // Поле для повідомлення про помилку
+        String errorMessage = "";
 
         while (true) {
             clearScreen();
 
-            // Виведення полів для введення
             for (int i = 0; i < fields.length; i++) {
                 textGraphics.setForegroundColor(TextColor.ANSI.WHITE);
                 textGraphics.putString(8, 4 + i * 4,
@@ -436,13 +460,11 @@ public class MenuHandler {
                 textGraphics.putString(22, 5 + i * 4, inputToShow);
             }
 
-            // Виведення повідомлення про помилку (якщо воно є)
             if (!errorMessage.isEmpty()) {
                 textGraphics.setForegroundColor(TextColor.ANSI.RED);
                 textGraphics.putString(10, 7, errorMessage);
             }
 
-            // Виведення кнопок
             for (int i = 0; i < buttons.length; i++) {
                 if (i == selectedFieldIndex - fields.length) {
                     textGraphics.setForegroundColor(TextColor.ANSI.GREEN);
@@ -471,13 +493,13 @@ public class MenuHandler {
                 case Enter:
                     if (selectedFieldIndex == fields.length) {
                         if (inputs[0].equals("0000")) {
-                            showAdminMenu(); // Якщо ключ правильний, відкриваємо меню адміна
+                            showAdminMenu();
                             return;
                         } else {
                             errorMessage = "Невірний ключ!";
                         }
                     } else if (selectedFieldIndex == fields.length + 1) {
-                        showLoginWindow(); // Якщо натиснуто "Вихід"
+                        showLoginWindow();
                         return;
                     }
                     break;
@@ -500,6 +522,17 @@ public class MenuHandler {
         }
     }
 
+    /**
+     * Відображає меню адміністратора, де можна вибрати один з пунктів управління. Адміністратор
+     * може керувати користувачами, історичними місцями, додавати або редагувати їх, а також
+     * переглядати відгуки та налаштування.
+     * <p>
+     * Після вибору пункту меню виконується відповідна дія: - Управління користувачами - Перегляд
+     * історичних місць - Додавання історичного місця - Редагування історичного місця - Керування
+     * відгуками - Налаштування - Вихід з програми
+     *
+     * @throws IOException якщо виникає помилка при взаємодії з екраном.
+     */
     public void showAdminMenu() throws IOException {
         clearScreen();
 
@@ -508,13 +541,14 @@ public class MenuHandler {
             "Історичні місця",
             "Додати історичне місце",
             "Редагувати історичне місце",
-            "Відгуки",  // Додали пункт для відгуків
-            "Налаштування",  // Налаштування після відгуків
+            "Відгуки",
+            "Налаштування",
             "Вихід з програми"
         };
 
         int selectedIndex = 0;
 
+        // Створення об'єктів для керування різними частинами меню.
         UserManager userManager = new UserManager(userRepository, textGraphics, screen);
         HistoricalPlaceRepository historicalPlaceRepository = new HistoricalPlaceRepository();
         AddHistoricalPlaceUI addHistoricalPlaceUI = new AddHistoricalPlaceUI(
@@ -524,10 +558,9 @@ public class MenuHandler {
         EditHistoricalPlaceUI editHistoricalPlaceUI = new EditHistoricalPlaceUI(
             historicalPlaceRepository, screen, this);
 
-        // Створюємо екземпляр ReviewManager
-        ReviewRepository reviewRepository = new ReviewRepository();  // Репозиторій для відгуків
+        ReviewRepository reviewRepository = new ReviewRepository();
         ReviewManager reviewManager = new ReviewManager(reviewRepository, textGraphics,
-            screen);  // Менеджер відгуків
+            screen);
 
         MenuHandler menuHandler = new MenuHandler(screen, textGraphics, userRepository);
         SettingsUI settingsUI = new SettingsUI(screen, menuHandler);
@@ -574,10 +607,10 @@ public class MenuHandler {
                             editHistoricalPlaceUI.show();
                             break;
                         case 4:
-                            reviewManager.manageReviews();  // Відкриваємо меню відгуків
+                            reviewManager.manageReviews();
                             break;
                         case 5:
-                            settingsUI.show(); // Відкриваємо меню налаштувань
+                            settingsUI.show();
                             break;
                         case 6:
                             screen.stopScreen();
@@ -585,11 +618,17 @@ public class MenuHandler {
                             break;
                     }
                     break;
-                // Видаляємо case Escape
             }
         }
     }
 
+    /**
+     * Відображає меню користувача, в якому можна вибрати один з пунктів: - Перегляд історичних
+     * місць - Відгуки та рейтинги - Налаштування - Вихід з програми
+     * <p>
+     * Після вибору пункту меню виконується відповідна дія: - Перегляд історичних місць - Перегляд
+     * відгуків та рейтингів - Налаштування - Вихід з програми
+     */
     public void showUserMenu() {
         try {
             clearScreen();
@@ -661,7 +700,6 @@ public class MenuHandler {
                                 break;
                         }
                         break;
-                    // Видаляємо case Escape
                 }
             }
         } catch (IOException e) {
@@ -669,10 +707,14 @@ public class MenuHandler {
         }
     }
 
+    /**
+     * Очищає екран консольного інтерфейсу. Це виконується шляхом заповнення екрану пробілами.
+     *
+     * @throws IOException якщо виникає помилка при взаємодії з екраном.
+     */
     private void clearScreen() throws IOException {
         textGraphics.setBackgroundColor(TextColor.ANSI.BLACK);
 
-        // Use a loop to fill the screen with spaces
         int screenWidth = screen.getTerminalSize().getColumns();
         int screenHeight = screen.getTerminalSize().getRows();
 
@@ -682,10 +724,15 @@ public class MenuHandler {
         }
     }
 
+    /**
+     * Відображає правила реєстрації. Правила містять вимоги до логіну, пошти та паролю. Після
+     * перегляду правил користувач може повернутися до головного меню, натиснувши будь-яку клавішу.
+     *
+     * @throws IOException якщо виникає помилка при взаємодії з екраном.
+     */
     private void showRegistrationRules() throws IOException {
         clearScreen();
 
-        // Текст правил реєстрації:
         String[] rules = {
             "Правила реєстрації:",
             "1. Логін та електронна пошта повинні бути унікальними.",
@@ -695,16 +742,14 @@ public class MenuHandler {
             "Натисніть будь-яку клавішу для повернення до меню."
         };
 
-        // Виведення правил на екран
         for (int i = 0; i < rules.length; i++) {
             textGraphics.setForegroundColor(TextColor.ANSI.WHITE);
-            textGraphics.putString(10, 5 + i, rules[i]);  // Виводимо кожне правило на новому рядку
+            textGraphics.putString(10, 5 + i, rules[i]);
         }
 
         screen.refresh();
 
-        // Чекаємо на натискання клавіші для повернення до головного меню
         screen.readInput();
-        showMainMenu(); // Повертаємось до головного меню
+        showMainMenu();
     }
 }

@@ -1,0 +1,7 @@
+com.agors.historiography.appui
+com.agors.historiography.appui.forms
+com.agors.historiography.appui.window
+com.agors.historiography.domain.entity
+com.agors.historiography.domain.message
+com.agors.historiography.domain.validations
+com.agors.historiography.persistence.repository

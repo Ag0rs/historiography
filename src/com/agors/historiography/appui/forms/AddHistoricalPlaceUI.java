@@ -9,34 +9,54 @@ import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.screen.Screen;
 import java.io.IOException;
 
+/**
+ * Клас для відображення інтерфейсу додавання історичного місця. Цей клас відповідає за відображення
+ * форми для введення даних історичного місця, перевірку коректності введених даних та їх
+ * збереження.
+ */
 public class AddHistoricalPlaceUI {
 
     private final HistoricalPlaceRepository repository;
     private final Screen screen;
 
+    /**
+     * Конструктор для ініціалізації об'єкта інтерфейсу.
+     *
+     * @param repository Репозиторій для збереження історичних місць.
+     * @param screen     Об'єкт для роботи з екраном.
+     */
     public AddHistoricalPlaceUI(HistoricalPlaceRepository repository, Screen screen) {
         this.repository = repository;
         this.screen = screen;
     }
 
+    /**
+     * Виводить форму для введення даних історичного місця і обробляє взаємодію з користувачем.
+     * Включає перевірку введених даних і додавання нового історичного місця до репозиторію.
+     *
+     * @throws IOException Якщо виникає помилка при роботі з екраном.
+     */
     public void show() throws IOException {
         screen.clear();
         TextGraphics textGraphics = screen.newTextGraphics();
 
+        // Поля для введення
         String[] fields = {"Назва", "Опис", "Локація", "Категорія"};
         String[] inputs = {"", "", "", ""};
         int selectedFieldIndex = 0;
 
+        // Кнопки
         String[] buttons = {"Зберегти", "Вийти"};
 
         final int MAX_LINE_WIDTH = 55;
         final int VERTICAL_OFFSET = 5;
         final int MAX_INPUT_LENGTH = 165;
 
+        // Основний цикл взаємодії з користувачем
         while (true) {
             screen.clear();
 
-            // Rendering input fields and buttons
+            // Виведення полів для введення
             for (int i = 0; i < fields.length; i++) {
                 textGraphics.setForegroundColor(TextColor.ANSI.WHITE);
                 textGraphics.putString(9, 1 + i * VERTICAL_OFFSET,
@@ -61,7 +81,6 @@ public class AddHistoricalPlaceUI {
                     ? inputs[i].substring(0, MAX_INPUT_LENGTH)
                     : inputs[i];
 
-                // Adjust yOffset to avoid overlapping text
                 int yOffset = 2 + i * VERTICAL_OFFSET;
                 for (int j = 0; j < inputText.length(); j += MAX_LINE_WIDTH) {
                     int endIndex = Math.min(j + MAX_LINE_WIDTH, inputText.length());
@@ -70,7 +89,7 @@ public class AddHistoricalPlaceUI {
                 }
             }
 
-            // Rendering buttons
+            // Виведення кнопок
             for (int i = 0; i < buttons.length; i++) {
                 int buttonY = 21 + i;
                 if (selectedFieldIndex == fields.length + i) {
@@ -84,6 +103,7 @@ public class AddHistoricalPlaceUI {
             screen.refresh();
             KeyStroke keyStroke = screen.readInput();
 
+            // Обробка натискання клавіші
             switch (keyStroke.getKeyType()) {
                 case ArrowDown:
                     if (selectedFieldIndex < fields.length + buttons.length - 1) {
@@ -111,16 +131,12 @@ public class AddHistoricalPlaceUI {
                                 inputs[2], inputs[3]);
                             repository.addHistoricalPlace(place);
 
-                            // Задаємо колір тексту на зелений
                             textGraphics.setForegroundColor(TextColor.ANSI.GREEN);
 
-                            // Виводимо повідомлення
                             textGraphics.putString(25, 22, "Місце успішно додано!");
 
-                            // Оновлюємо екран
                             screen.refresh();
 
-                            // Затримка для демонстрації повідомлення
                             try {
                                 Thread.sleep(2000);
                             } catch (InterruptedException e) {
@@ -143,8 +159,8 @@ public class AddHistoricalPlaceUI {
                     }
                     break;
 
-                case Escape:  // Handle Esc key
-                    return; // Exits the current form and returns to the previous menu
+                case Escape:
+                    return;
 
                 default:
                     if (keyStroke.getCharacter() != null && selectedFieldIndex >= 0

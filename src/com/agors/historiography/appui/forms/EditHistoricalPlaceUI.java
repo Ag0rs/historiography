@@ -12,13 +12,24 @@ import com.googlecode.lanterna.screen.Screen;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * Клас, який відповідає за інтерфейс редагування історичних місць. Реалізує функціональність
+ * перегляду, редагування та видалення історичних місць.
+ */
 public class EditHistoricalPlaceUI {
 
-    private static final int MAX_VISIBLE_PLACES = 10; // Set this value to the number of places to display at once
+    private static final int MAX_VISIBLE_PLACES = 10;
     private final HistoricalPlaceRepository historicalPlaceRepository;
     private final Screen screen;
     private final MenuHandler menuHandler;
 
+    /**
+     * Конструктор класу.
+     *
+     * @param historicalPlaceRepository репозиторій для роботи з історичними місцями
+     * @param screen                    екран для відображення інтерфейсу
+     * @param menuHandler               обробник меню
+     */
     public EditHistoricalPlaceUI(HistoricalPlaceRepository historicalPlaceRepository,
         Screen screen,
         MenuHandler menuHandler) {
@@ -27,7 +38,13 @@ public class EditHistoricalPlaceUI {
         this.menuHandler = menuHandler;
     }
 
-    public void show() throws IOException { // Зроблено public
+    /**
+     * Показує список історичних місць для редагування. Дозволяє вибирати місце для редагування чи
+     * видалення.
+     *
+     * @throws IOException у разі проблем з відображенням на екрані
+     */
+    public void show() throws IOException {
         List<HistoricalPlace> places = historicalPlaceRepository.getHistoricalPlaces();
 
         if (places.isEmpty()) {
@@ -36,7 +53,7 @@ public class EditHistoricalPlaceUI {
         }
 
         int selectedIndex = 0;
-        int startIndex = 0;  // Початковий індекс для прокручування
+        int startIndex = 0;
 
         while (true) {
             screen.clear();
@@ -52,7 +69,6 @@ public class EditHistoricalPlaceUI {
                     if (selectedIndex < places.size() - 1) {
                         selectedIndex++;
                     }
-                    // Якщо вибір виходить за межі екрану, прокручуємо список вниз
                     if (selectedIndex >= startIndex + MAX_VISIBLE_PLACES) {
                         startIndex++;
                     }
@@ -61,7 +77,6 @@ public class EditHistoricalPlaceUI {
                     if (selectedIndex > 0) {
                         selectedIndex--;
                     }
-                    // Якщо вибір знаходиться в верхній частині списку, прокручуємо його вгору
                     if (selectedIndex < startIndex) {
                         startIndex--;
                     }
@@ -71,19 +86,27 @@ public class EditHistoricalPlaceUI {
                     showEditMenu(selectedPlace);
                     return;
                 case Escape:
-                    return; // Назад до попереднього меню
+                    return;
             }
         }
     }
 
+    /**
+     * Відображає список історичних місць на екрані.
+     *
+     * @param places        список історичних місць
+     * @param selectedIndex індекс вибраного місця
+     * @param startIndex    індекс початку видимого списку
+     * @param textGraphics  об'єкт для малювання на екрані
+     */
     private void displayPlaces(List<HistoricalPlace> places, int selectedIndex, int startIndex,
         TextGraphics textGraphics) {
         int endIndex = Math.min(places.size(),
-            startIndex + MAX_VISIBLE_PLACES); // Кількість елементів для відображення
+            startIndex + MAX_VISIBLE_PLACES);
 
         // Відображення історичних місць
         for (int i = startIndex; i < endIndex; i++) {
-            int displayIndex = i - startIndex;  // Відносний індекс для відображення на екрані
+            int displayIndex = i - startIndex;
             if (i == selectedIndex) {
                 textGraphics.setForegroundColor(TextColor.ANSI.GREEN);
                 textGraphics.putString(10, 5 + displayIndex, "▶ " + places.get(i).getName());
@@ -93,14 +116,18 @@ public class EditHistoricalPlaceUI {
             }
         }
 
-        // Додавання інструкцій внизу меню
         textGraphics.setForegroundColor(ANSI.YELLOW);
         textGraphics.putString(10, MAX_VISIBLE_PLACES + 7,
             "↑ Вгору   ↓ Вниз   Enter - Переглянути   Esc - Вихід");
     }
 
+    /**
+     * Відображає повідомлення, що немає доступних історичних місць для редагування.
+     *
+     * @throws IOException у разі проблем з відображенням на екрані
+     */
     private void showNoPlacesMessage() throws IOException {
-        screen.clear();  // Очищаємо екран перед виведенням повідомлення
+        screen.clear();
         TextGraphics textGraphics = screen.newTextGraphics();
         textGraphics.setForegroundColor(TextColor.ANSI.RED);
         textGraphics.putString(10, 5, "Немає доступних історичних місць для редагування.");
@@ -108,6 +135,12 @@ public class EditHistoricalPlaceUI {
         screen.readInput();
     }
 
+    /**
+     * Показує меню редагування для вибраного історичного місця.
+     *
+     * @param place історичне місце, яке редагується
+     * @throws IOException у разі проблем з відображенням на екрані
+     */
     private void showEditMenu(HistoricalPlace place) throws IOException {
         String[] options = {"Змінити", "Видалити", "Назад"};
         int selectedOption = 0;
@@ -129,7 +162,7 @@ public class EditHistoricalPlaceUI {
             }
             screen.refresh();
             KeyStroke keyStroke = screen.readInput();
-            KeyType keyType = keyStroke.getKeyType(); // Correctly get the KeyType
+            KeyType keyType = keyStroke.getKeyType();
 
             switch (keyType) {
                 case ArrowDown:
@@ -144,15 +177,21 @@ public class EditHistoricalPlaceUI {
                     } else if (selectedOption == 1) {
                         deleteHistoricalPlace(place);
                     } else if (selectedOption == 2) {
-                        return; // Назад
+                        return;
                     }
                     break;
                 case Escape:
-                    return; // Назад до попереднього меню
+                    return;
             }
         }
     }
 
+    /**
+     * Дозволяє редагувати деталі вибраного історичного місця.
+     *
+     * @param place історичне місце, яке редагується
+     * @throws IOException у разі проблем з відображенням на екрані
+     */
     private void editPlaceDetails(HistoricalPlace place) throws IOException {
         screen.clear();
         String[] fields = {"Назва", "Опис", "Локація", "Категорія"};
@@ -160,7 +199,7 @@ public class EditHistoricalPlaceUI {
             place.getCategory()};
 
         int selectedFieldIndex = 0;
-        int selectedButtonIndex = -1;  // -1, якщо кнопки не вибрані
+        int selectedButtonIndex = -1;
         String[] buttons = {"Змінити", "Назад"};
 
         final int MAX_LINE_WIDTH = 55;
@@ -171,7 +210,6 @@ public class EditHistoricalPlaceUI {
         while (true) {
             screen.clear();
 
-            // Відображення полів для редагування
             for (int i = 0; i < fields.length; i++) {
                 textGraphics.setForegroundColor(TextColor.ANSI.WHITE);
                 textGraphics.putString(9, 1 + i * VERTICAL_OFFSET,
@@ -196,15 +234,13 @@ public class EditHistoricalPlaceUI {
                     ? inputs[i].substring(0, MAX_INPUT_LENGTH)
                     : inputs[i];
 
-                int yOffset = 2 + i * VERTICAL_OFFSET; // Зміщення на один рядок вище
+                int yOffset = 2 + i * VERTICAL_OFFSET;
                 for (int j = 0; j < inputText.length(); j += MAX_LINE_WIDTH) {
                     int endIndex = Math.min(j + MAX_LINE_WIDTH, inputText.length());
                     textGraphics.putString(20, yOffset, inputText.substring(j, endIndex));
                     yOffset += 1;
                 }
             }
-
-            // Відображення кнопок "Змінити" та "Назад"
             for (int i = 0; i < buttons.length; i++) {
                 int buttonY = 21 + i;
                 if (selectedFieldIndex == fields.length + i) {
@@ -233,15 +269,13 @@ public class EditHistoricalPlaceUI {
 
                 case Enter:
                     if (selectedFieldIndex == fields.length) {
-                        // Перевірка на порожні поля
                         if (!HistoricalPlaceValidator.isValid(inputs[0], inputs[1], inputs[2],
                             inputs[3])) {
                             textGraphics.setForegroundColor(TextColor.ANSI.RED);
                             textGraphics.putString(25, 22,
-                                "Будь ласка, заповніть всі поля!"); // Перемістив вище
-                            screen.refresh(); // Оновлюємо екран
+                                "Будь ласка, заповніть всі поля!");
+                            screen.refresh();
 
-                            // Очікуємо будь-яке натискання клавіші перед очищенням повідомлення
                             screen.readInput();
                         } else {
                             place.setName(inputs[0]);
@@ -277,8 +311,13 @@ public class EditHistoricalPlaceUI {
         }
     }
 
+    /**
+     * Видаляє вибране історичне місце.
+     *
+     * @param place історичне місце, яке потрібно видалити
+     * @throws IOException у разі проблем з відображенням на екрані
+     */
     private void deleteHistoricalPlace(HistoricalPlace place) throws IOException {
-        // Запит на підтвердження перед видаленням
         screen.clear();
         TextGraphics textGraphics = screen.newTextGraphics();
         textGraphics.setForegroundColor(TextColor.ANSI.YELLOW);
@@ -286,32 +325,23 @@ public class EditHistoricalPlaceUI {
 
         screen.refresh();
 
-        // Очікуємо введення користувача
         KeyStroke keyStroke = screen.readInput();
         Character response = keyStroke.getCharacter();
 
-        // Перевірка, чи є введення, і чи це символ 'y' або 'n'
         if (response != null && (response == 'y' || response == 'Y')) {
-            // Видалення історичного місця зі сховища
             historicalPlaceRepository.getHistoricalPlaces().remove(place);
             historicalPlaceRepository.saveHistoricalPlaces();
 
-            // Відображення повідомлення про успішне видалення
             screen.clear();
             textGraphics.setForegroundColor(TextColor.ANSI.RED);
             textGraphics.putString(10, 5,
                 "Історичне місце '" + place.getName() + "' було успішно видалено.");
             screen.refresh();
 
-            // Очікування натискання будь-якої клавіші перед поверненням
             screen.readInput();
         } else {
-            // Повернення до попереднього меню без видалення
             return;
         }
-
-        // Повернення до адміністративного меню
-        menuHandler.showAdminMenu(); // викликаємо showAdminMenu після видалення
+        menuHandler.showAdminMenu();
     }
-
 }

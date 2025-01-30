@@ -6,8 +6,18 @@ import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import java.io.IOException;
 
+/**
+ * Головний клас програми Historiography. Відповідає за запуск додатку, створення екрану за
+ * допомогою Lanterna та ініціалізацію основних компонентів інтерфейсу користувача.
+ */
 public class Historiography {
 
+    /**
+     * Основний метод програми. Створює екран, ініціалізує необхідні компоненти, та виводить
+     * привітальне повідомлення і головне меню.
+     *
+     * @param args аргументи командного рядка (не використовуються в даному випадку).
+     */
     public static void main(String[] args) {
         try {
             // Створюємо екран через DefaultTerminalFactory

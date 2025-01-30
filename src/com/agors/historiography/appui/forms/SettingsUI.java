@@ -6,19 +6,33 @@ import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.screen.Screen;
 import java.io.IOException;
 
+/**
+ * Клас для відображення та обробки меню налаштувань. Забезпечує можливість вийти з облікового
+ * запису або повернутися в головне меню.
+ */
 public class SettingsUI {
 
     private final Screen screen;
     private final TextGraphics textGraphics;
-    private final MenuHandler menuHandler;  // Замість MainMenuUI, використовуємо MenuHandler
+    private final MenuHandler menuHandler;
 
-    // Оновлений конструктор
+    /**
+     * Конструктор класу SettingsUI.
+     *
+     * @param screen      екран, на якому буде відображатися інтерфейс.
+     * @param menuHandler обробник меню для переходу до іншого інтерфейсу.
+     */
     public SettingsUI(Screen screen, MenuHandler menuHandler) {
         this.screen = screen;
         this.textGraphics = screen.newTextGraphics();
-        this.menuHandler = menuHandler;  // Ініціалізуємо посилання на MenuHandler
+        this.menuHandler = menuHandler;
     }
 
+    /**
+     * Показує меню налаштувань і обробляє введення користувача.
+     *
+     * @throws IOException якщо сталася помилка при відображенні на екрані.
+     */
     public void show() throws IOException {
         clearScreen();
 
@@ -35,7 +49,7 @@ public class SettingsUI {
             textGraphics.putString(10, 2, "Меню налаштувань");
             textGraphics.putString(10, 3, "──────────────────");
 
-            // Відображення кнопок з символом стрілочки
+            // Відображаємо варіанти меню
             for (int i = 0; i < settingsMenuOptions.length; i++) {
                 if (i == selectedIndex) {
                     textGraphics.setForegroundColor(TextColor.ANSI.GREEN);
@@ -61,24 +75,33 @@ public class SettingsUI {
                 case Enter:
                     switch (selectedIndex) {
                         case 0:
-                            logOut();  // Виклик логіки для виходу з облікового запису
+                            logOut();
                             break;
                         case 1:
-                            return; // Повернення в головне меню
+                            return;
                     }
                     break;
                 case Escape:
-                    return; // Повернення в головне меню
+                    return;
             }
         }
     }
 
-    // Метод для очищення екрану
+    /**
+     * Очищає екран.
+     *
+     * @throws IOException якщо сталася помилка при очищенні екрану.
+     */
     private void clearScreen() throws IOException {
         screen.clear();
     }
 
-    // Логіка для виходу з облікового запису з підтвердженням
+    /**
+     * Обробляє виведення повідомлення про вихід з облікового запису. Запитує у користувача, чи він
+     * дійсно хоче вийти, і обробляє відповідь.
+     *
+     * @throws IOException якщо сталася помилка при відображенні на екрані.
+     */
     private void logOut() throws IOException {
         screen.clear();
         textGraphics.setForegroundColor(TextColor.ANSI.YELLOW);
@@ -93,7 +116,7 @@ public class SettingsUI {
             textGraphics.putString(10, 4, "Ви вийшли з облікового запису.");
             screen.refresh();
             screen.readInput();
-            menuHandler.showMainMenu();  // Викликаємо головне меню з MenuHandler
+            menuHandler.showMainMenu();
         } else {
             textGraphics.setForegroundColor(TextColor.ANSI.YELLOW);
             textGraphics.putString(10, 4, "Операція скасована.");
