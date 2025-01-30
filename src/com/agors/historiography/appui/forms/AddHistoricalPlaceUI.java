@@ -36,6 +36,7 @@ public class AddHistoricalPlaceUI {
         while (true) {
             screen.clear();
 
+            // Rendering input fields and buttons
             for (int i = 0; i < fields.length; i++) {
                 textGraphics.setForegroundColor(TextColor.ANSI.WHITE);
                 textGraphics.putString(9, 1 + i * VERTICAL_OFFSET,
@@ -60,8 +61,8 @@ public class AddHistoricalPlaceUI {
                     ? inputs[i].substring(0, MAX_INPUT_LENGTH)
                     : inputs[i];
 
-                // Зменшуємо yOffset на 1
-                int yOffset = 2 + i * VERTICAL_OFFSET; // Зміщення на один рядок вище
+                // Adjust yOffset to avoid overlapping text
+                int yOffset = 2 + i * VERTICAL_OFFSET;
                 for (int j = 0; j < inputText.length(); j += MAX_LINE_WIDTH) {
                     int endIndex = Math.min(j + MAX_LINE_WIDTH, inputText.length());
                     textGraphics.putString(20, yOffset, inputText.substring(j, endIndex));
@@ -69,6 +70,7 @@ public class AddHistoricalPlaceUI {
                 }
             }
 
+            // Rendering buttons
             for (int i = 0; i < buttons.length; i++) {
                 int buttonY = 21 + i;
                 if (selectedFieldIndex == fields.length + i) {
@@ -100,11 +102,8 @@ public class AddHistoricalPlaceUI {
                         if (!HistoricalPlaceValidator.isValid(inputs[0], inputs[1], inputs[2],
                             inputs[3])) {
                             textGraphics.setForegroundColor(TextColor.ANSI.RED);
-                            textGraphics.putString(25, 22,
-                                "Будь ласка, заповніть всі поля!"); // Перемістив вище
-                            screen.refresh(); // Оновлюємо екран
-
-                            // Очікуємо будь-яке натискання клавіші перед очищенням повідомлення
+                            textGraphics.putString(25, 22, "Будь ласка, заповніть всі поля!");
+                            screen.refresh();
                             screen.readInput();
                         } else {
                             int id = repository.getHistoricalPlaces().size() + 1;
@@ -133,6 +132,9 @@ public class AddHistoricalPlaceUI {
                         }
                     }
                     break;
+
+                case Escape:  // Handle Esc key
+                    return; // Exits the current form and returns to the previous menu
 
                 default:
                     if (keyStroke.getCharacter() != null && selectedFieldIndex >= 0

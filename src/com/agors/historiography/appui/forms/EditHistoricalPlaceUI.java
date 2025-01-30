@@ -4,6 +4,7 @@ import com.agors.historiography.domain.entity.HistoricalPlace;
 import com.agors.historiography.domain.validations.HistoricalPlaceValidator;
 import com.agors.historiography.persistence.repository.HistoricalPlaceRepository;
 import com.googlecode.lanterna.TextColor;
+import com.googlecode.lanterna.TextColor.ANSI;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
@@ -13,6 +14,7 @@ import java.util.List;
 
 public class EditHistoricalPlaceUI {
 
+    private static final int MAX_VISIBLE_PLACES = 10; // Set this value to the number of places to display at once
     private final HistoricalPlaceRepository historicalPlaceRepository;
     private final Screen screen;
     private final MenuHandler menuHandler;
@@ -25,7 +27,7 @@ public class EditHistoricalPlaceUI {
         this.menuHandler = menuHandler;
     }
 
-    public void show() throws IOException {
+    public void show() throws IOException { // Зроблено public
         List<HistoricalPlace> places = historicalPlaceRepository.getHistoricalPlaces();
 
         if (places.isEmpty()) {
@@ -34,21 +36,35 @@ public class EditHistoricalPlaceUI {
         }
 
         int selectedIndex = 0;
+        int startIndex = 0;  // Початковий індекс для прокручування
+
         while (true) {
             screen.clear();
             TextGraphics textGraphics = screen.newTextGraphics();
-            displayPlaces(places, selectedIndex, textGraphics);
+            displayPlaces(places, selectedIndex, startIndex, textGraphics);
             screen.refresh();
 
             KeyStroke keyStroke = screen.readInput();
-            KeyType keyType = keyStroke.getKeyType(); // Correctly get the KeyType
+            KeyType keyType = keyStroke.getKeyType();
 
             switch (keyType) {
                 case ArrowDown:
-                    selectedIndex = (selectedIndex + 1) % places.size();
+                    if (selectedIndex < places.size() - 1) {
+                        selectedIndex++;
+                    }
+                    // Якщо вибір виходить за межі екрану, прокручуємо список вниз
+                    if (selectedIndex >= startIndex + MAX_VISIBLE_PLACES) {
+                        startIndex++;
+                    }
                     break;
                 case ArrowUp:
-                    selectedIndex = (selectedIndex - 1 + places.size()) % places.size();
+                    if (selectedIndex > 0) {
+                        selectedIndex--;
+                    }
+                    // Якщо вибір знаходиться в верхній частині списку, прокручуємо його вгору
+                    if (selectedIndex < startIndex) {
+                        startIndex--;
+                    }
                     break;
                 case Enter:
                     HistoricalPlace selectedPlace = places.get(selectedIndex);
@@ -60,17 +76,27 @@ public class EditHistoricalPlaceUI {
         }
     }
 
-    private void displayPlaces(List<HistoricalPlace> places, int selectedIndex,
+    private void displayPlaces(List<HistoricalPlace> places, int selectedIndex, int startIndex,
         TextGraphics textGraphics) {
-        for (int i = 0; i < places.size(); i++) {
+        int endIndex = Math.min(places.size(),
+            startIndex + MAX_VISIBLE_PLACES); // Кількість елементів для відображення
+
+        // Відображення історичних місць
+        for (int i = startIndex; i < endIndex; i++) {
+            int displayIndex = i - startIndex;  // Відносний індекс для відображення на екрані
             if (i == selectedIndex) {
                 textGraphics.setForegroundColor(TextColor.ANSI.GREEN);
-                textGraphics.putString(10, 5 + i, "▶ " + places.get(i).getName());
+                textGraphics.putString(10, 5 + displayIndex, "▶ " + places.get(i).getName());
             } else {
                 textGraphics.setForegroundColor(TextColor.ANSI.WHITE);
-                textGraphics.putString(10, 5 + i, places.get(i).getName());
+                textGraphics.putString(10, 5 + displayIndex, places.get(i).getName());
             }
         }
+
+        // Додавання інструкцій внизу меню
+        textGraphics.setForegroundColor(ANSI.YELLOW);
+        textGraphics.putString(10, MAX_VISIBLE_PLACES + 7,
+            "↑ Вгору   ↓ Вниз   Enter - Переглянути   Esc - Вихід");
     }
 
     private void showNoPlacesMessage() throws IOException {
@@ -252,20 +278,37 @@ public class EditHistoricalPlaceUI {
     }
 
     private void deleteHistoricalPlace(HistoricalPlace place) throws IOException {
-        // Видалення історичного місця зі сховища
-        historicalPlaceRepository.getHistoricalPlaces().remove(place);
-        historicalPlaceRepository.saveHistoricalPlaces();
-
-        // Відображення повідомлення про успішне видалення
+        // Запит на підтвердження перед видаленням
         screen.clear();
         TextGraphics textGraphics = screen.newTextGraphics();
-        textGraphics.setForegroundColor(TextColor.ANSI.RED);
-        textGraphics.putString(10, 5,
-            "Історичне місце '" + place.getName() + "' було успішно видалено.");
+        textGraphics.setForegroundColor(TextColor.ANSI.YELLOW);
+        textGraphics.putString(10, 5, "Ви дійсно хочете видалити це історичне місце? (y/n)");
+
         screen.refresh();
 
-        // Очікування натискання будь-якої клавіші перед поверненням
-        screen.readInput();
+        // Очікуємо введення користувача
+        KeyStroke keyStroke = screen.readInput();
+        Character response = keyStroke.getCharacter();
+
+        // Перевірка, чи є введення, і чи це символ 'y' або 'n'
+        if (response != null && (response == 'y' || response == 'Y')) {
+            // Видалення історичного місця зі сховища
+            historicalPlaceRepository.getHistoricalPlaces().remove(place);
+            historicalPlaceRepository.saveHistoricalPlaces();
+
+            // Відображення повідомлення про успішне видалення
+            screen.clear();
+            textGraphics.setForegroundColor(TextColor.ANSI.RED);
+            textGraphics.putString(10, 5,
+                "Історичне місце '" + place.getName() + "' було успішно видалено.");
+            screen.refresh();
+
+            // Очікування натискання будь-якої клавіші перед поверненням
+            screen.readInput();
+        } else {
+            // Повернення до попереднього меню без видалення
+            return;
+        }
 
         // Повернення до адміністративного меню
         menuHandler.showAdminMenu(); // викликаємо showAdminMenu після видалення

@@ -89,6 +89,11 @@
       "email": "aaaaaaaaaaaaaaaaaa@aaaaaaa.aaa",
       "password": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
       "role": "User"
+    },
+    "user": {
+      "email": "user@gmail.com",
+      "password": "123456",
+      "role": "User"
     }
   }
 }

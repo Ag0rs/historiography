@@ -483,7 +483,7 @@ public class MenuHandler {
             "Історичні місця",
             "Додати історичне місце",
             "Редагувати історичне місце",
-            "Вихід з акаунта",
+            "Налаштування",
             "Вихід з програми"
         };
 
@@ -496,7 +496,10 @@ public class MenuHandler {
         ViewHistoricalPlacesUI viewHistoricalPlacesUI = new ViewHistoricalPlacesUI(
             historicalPlaceRepository, screen);
         EditHistoricalPlaceUI editHistoricalPlaceUI = new EditHistoricalPlaceUI(
-            historicalPlaceRepository, screen, this); // <-- Передаємо MenuHandler
+            historicalPlaceRepository, screen, this);
+
+        MenuHandler menuHandler = new MenuHandler(screen, textGraphics, userRepository);
+        SettingsUI settingsUI = new SettingsUI(screen, menuHandler);
 
         while (true) {
             clearScreen();
@@ -540,8 +543,8 @@ public class MenuHandler {
                             editHistoricalPlaceUI.show();
                             break;
                         case 4:
-                            showLoginWindow();
-                            return;
+                            settingsUI.show(); // Відкриваємо меню налаштувань
+                            break;
                         case 5:
                             screen.stopScreen();
                             System.exit(0);
@@ -554,21 +557,44 @@ public class MenuHandler {
         }
     }
 
-    private void showUserMenu() throws IOException {
+    public void showUserMenu() throws IOException {
         clearScreen();
-        String[] userMenuOptions = {"Перегляд історичних місць", "Вихід"};
+
+        String[] userMenuOptions = {
+            "Перегляд історичних місць",
+            "Додати відгук",
+            "Ставити рейтинг",
+            "Налаштування",
+            "Вихід з програми"
+        };
+
         int selectedIndex = 0;
+
+        HistoricalPlaceRepository historicalPlaceRepository = new HistoricalPlaceRepository();
+        ViewHistoricalPlacesUI viewHistoricalPlacesUI = new ViewHistoricalPlacesUI(
+            historicalPlaceRepository, screen);
+
+        MenuHandler menuHandler = new MenuHandler(screen, textGraphics,
+            userRepository); // Створюємо MenuHandler
+        SettingsUI settingsUI = new SettingsUI(screen, menuHandler);  // Тепер передаємо menuHandler
 
         while (true) {
             clearScreen();
+            textGraphics.setForegroundColor(TextColor.ANSI.CYAN);
+            textGraphics.putString(10, 2, "Меню користувача");
+            textGraphics.putString(10, 3, "────────────────────");
+
+            // Відображення кнопок
             for (int i = 0; i < userMenuOptions.length; i++) {
                 if (i == selectedIndex) {
                     textGraphics.setForegroundColor(TextColor.ANSI.GREEN);
+                    textGraphics.putString(8, 5 + i, "▶ " + userMenuOptions[i]);
                 } else {
                     textGraphics.setForegroundColor(TextColor.ANSI.WHITE);
+                    textGraphics.putString(10, 5 + i, userMenuOptions[i]);
                 }
-                textGraphics.putString(10, 5 + i, userMenuOptions[i]);
             }
+
             screen.refresh();
 
             KeyStroke keyStroke = screen.readInput();
@@ -581,13 +607,27 @@ public class MenuHandler {
                         (selectedIndex - 1 + userMenuOptions.length) % userMenuOptions.length;
                     break;
                 case Enter:
-                    if (userMenuOptions[selectedIndex].equals("Перегляд історичних місць")) {
-                        // Додайте код для перегляду історичних місць
-                    } else if (userMenuOptions[selectedIndex].equals("Вихід")) {
-                        screen.stopScreen();
-                        System.exit(0);
+                    switch (selectedIndex) {
+                        case 0:
+                            viewHistoricalPlacesUI.show(); // Викликаємо перегляд історичних місць
+                            break;
+                        case 1:
+                            // Додайте код для додавання відгуку
+                            break;
+                        case 2:
+                            // Додайте код для ставлення рейтингу
+                            break;
+                        case 3:
+                            settingsUI.show(); // Відкриваємо меню налаштувань
+                            break;
+                        case 4:
+                            screen.stopScreen();
+                            System.exit(0);  // Завершити програму
+                            break;
                     }
                     break;
+                case Escape:
+                    return;
             }
         }
     }
