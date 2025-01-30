@@ -91,7 +91,7 @@ public class UserManager {
                 case Enter:
                     // Якщо вибрано користувача
                     User selectedUser = users.get(selectedUserIndex);
-                    handleUserAction(selectedUser);
+                    confirmDeletion(selectedUser); // Підтвердження перед видаленням
                     return; // після виконання дії виходимо з циклу
 
                 case Escape:
@@ -109,17 +109,44 @@ public class UserManager {
         }
     }
 
-    private void handleUserAction(User selectedUser) throws IOException {
-        if (canDeleteUser(selectedUser)) {
-            userRepository.deleteUser(selectedUser.getUsername());
-            clearScreen();
-            textGraphics.setForegroundColor(TextColor.ANSI.GREEN);
-            textGraphics.putString(10, 5,
-                "Користувача " + selectedUser.getUsername() + " успішно видалено.");
-        } else {
-            clearScreen();
-            textGraphics.setForegroundColor(TextColor.ANSI.RED);
-            textGraphics.putString(10, 5, "Не можна видалити цього користувача (Admin).");
+    private void confirmDeletion(User selectedUser) throws IOException {
+        // Очищаємо екран та виводимо повідомлення про підтвердження
+        clearScreen();
+        textGraphics.setForegroundColor(TextColor.ANSI.YELLOW);
+        textGraphics.putString(10, 5, "Ви дійсно хочете видалити цього користувача? (y/n)");
+        screen.refresh();
+
+        // Чекаємо на введення
+        KeyStroke keyStroke = screen.readInput();
+
+        switch (keyStroke.getKeyType()) {
+            case Character:
+                if (keyStroke.getCharacter() == 'y' || keyStroke.getCharacter() == 'Y') {
+                    if (canDeleteUser(selectedUser)) {
+                        userRepository.deleteUser(selectedUser.getUsername());
+                        clearScreen();
+                        textGraphics.setForegroundColor(TextColor.ANSI.GREEN);
+                        textGraphics.putString(10, 5,
+                            "Користувача " + selectedUser.getUsername() + " успішно видалено.");
+                    } else {
+                        clearScreen();
+                        textGraphics.setForegroundColor(TextColor.ANSI.RED);
+                        textGraphics.putString(10, 5,
+                            "Не можна видалити цього користувача (Admin).");
+                    }
+                } else {
+                    clearScreen();
+                    textGraphics.setForegroundColor(TextColor.ANSI.RED);
+                    textGraphics.putString(10, 5, "Видалення скасовано.");
+                }
+                break;
+
+            case Escape:
+                // Скасування видалення
+                clearScreen();
+                textGraphics.setForegroundColor(TextColor.ANSI.RED);
+                textGraphics.putString(10, 5, "Видалення скасовано.");
+                break;
         }
         screen.refresh();
         screen.readInput(); // Чекаємо натискання клавіші для повернення

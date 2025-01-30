@@ -4,6 +4,7 @@ import com.agors.historiography.domain.entity.User;
 import com.agors.historiography.domain.message.MessageManager;
 import com.agors.historiography.domain.validations.Validation;
 import com.agors.historiography.persistence.repository.HistoricalPlaceRepository;
+import com.agors.historiography.persistence.repository.ReviewRepository;
 import com.agors.historiography.persistence.repository.UserRepository;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
@@ -475,7 +476,7 @@ public class MenuHandler {
         }
     }
 
-    public void showAdminMenu() throws IOException { // <-- Було private, стало public
+    public void showAdminMenu() throws IOException {
         clearScreen();
 
         String[] adminMenuOptions = {
@@ -483,7 +484,8 @@ public class MenuHandler {
             "Історичні місця",
             "Додати історичне місце",
             "Редагувати історичне місце",
-            "Налаштування",
+            "Відгуки",  // Додали пункт для відгуків
+            "Налаштування",  // Налаштування після відгуків
             "Вихід з програми"
         };
 
@@ -497,6 +499,11 @@ public class MenuHandler {
             historicalPlaceRepository, screen);
         EditHistoricalPlaceUI editHistoricalPlaceUI = new EditHistoricalPlaceUI(
             historicalPlaceRepository, screen, this);
+
+        // Створюємо екземпляр ReviewManager
+        ReviewRepository reviewRepository = new ReviewRepository();  // Репозиторій для відгуків
+        ReviewManager reviewManager = new ReviewManager(reviewRepository, textGraphics,
+            screen);  // Менеджер відгуків
 
         MenuHandler menuHandler = new MenuHandler(screen, textGraphics, userRepository);
         SettingsUI settingsUI = new SettingsUI(screen, menuHandler);
@@ -543,92 +550,98 @@ public class MenuHandler {
                             editHistoricalPlaceUI.show();
                             break;
                         case 4:
-                            settingsUI.show(); // Відкриваємо меню налаштувань
+                            reviewManager.manageReviews();  // Відкриваємо меню відгуків
                             break;
                         case 5:
+                            settingsUI.show(); // Відкриваємо меню налаштувань
+                            break;
+                        case 6:
                             screen.stopScreen();
                             System.exit(0);
                             break;
                     }
                     break;
-                case Escape:
-                    return;
+                // Видаляємо case Escape
             }
         }
     }
 
-    public void showUserMenu() throws IOException {
-        clearScreen();
-
-        String[] userMenuOptions = {
-            "Перегляд історичних місць",
-            "Додати відгук",
-            "Ставити рейтинг",
-            "Налаштування",
-            "Вихід з програми"
-        };
-
-        int selectedIndex = 0;
-
-        HistoricalPlaceRepository historicalPlaceRepository = new HistoricalPlaceRepository();
-        ViewHistoricalPlacesUI viewHistoricalPlacesUI = new ViewHistoricalPlacesUI(
-            historicalPlaceRepository, screen);
-
-        MenuHandler menuHandler = new MenuHandler(screen, textGraphics,
-            userRepository); // Створюємо MenuHandler
-        SettingsUI settingsUI = new SettingsUI(screen, menuHandler);  // Тепер передаємо menuHandler
-
-        while (true) {
+    public void showUserMenu() {
+        try {
             clearScreen();
-            textGraphics.setForegroundColor(TextColor.ANSI.CYAN);
-            textGraphics.putString(10, 2, "Меню користувача");
-            textGraphics.putString(10, 3, "────────────────────");
 
-            // Відображення кнопок
-            for (int i = 0; i < userMenuOptions.length; i++) {
-                if (i == selectedIndex) {
-                    textGraphics.setForegroundColor(TextColor.ANSI.GREEN);
-                    textGraphics.putString(8, 5 + i, "▶ " + userMenuOptions[i]);
-                } else {
-                    textGraphics.setForegroundColor(TextColor.ANSI.WHITE);
-                    textGraphics.putString(10, 5 + i, userMenuOptions[i]);
+            String[] userMenuOptions = {
+                "Перегляд історичних місць",
+                "Відгуки та рейтинги",
+                "Налаштування",
+                "Вихід з програми"
+            };
+
+            int selectedIndex = 0;
+
+            HistoricalPlaceRepository historicalPlaceRepository = new HistoricalPlaceRepository();
+            ReviewRepository reviewRepository = new ReviewRepository();
+
+            ViewHistoricalPlacesUI viewHistoricalPlacesUI = new ViewHistoricalPlacesUI(
+                historicalPlaceRepository, screen);
+
+            ReviewsAndRatingsUI reviewsAndRatingsUI = new ReviewsAndRatingsUI(
+                historicalPlaceRepository, screen, reviewRepository);
+
+            reviewsAndRatingsUI.setOnExitCallback(this::showUserMenu);
+
+            MenuHandler menuHandler = new MenuHandler(screen, textGraphics, userRepository);
+            SettingsUI settingsUI = new SettingsUI(screen, menuHandler);
+
+            while (true) {
+                clearScreen();
+                textGraphics.setForegroundColor(TextColor.ANSI.CYAN);
+                textGraphics.putString(10, 2, "Меню користувача");
+                textGraphics.putString(10, 3, "────────────────────");
+
+                for (int i = 0; i < userMenuOptions.length; i++) {
+                    if (i == selectedIndex) {
+                        textGraphics.setForegroundColor(TextColor.ANSI.GREEN);
+                        textGraphics.putString(8, 5 + i, "▶ " + userMenuOptions[i]);
+                    } else {
+                        textGraphics.setForegroundColor(TextColor.ANSI.WHITE);
+                        textGraphics.putString(10, 5 + i, userMenuOptions[i]);
+                    }
+                }
+
+                screen.refresh();
+
+                KeyStroke keyStroke = screen.readInput();
+                switch (keyStroke.getKeyType()) {
+                    case ArrowDown:
+                        selectedIndex = (selectedIndex + 1) % userMenuOptions.length;
+                        break;
+                    case ArrowUp:
+                        selectedIndex =
+                            (selectedIndex - 1 + userMenuOptions.length) % userMenuOptions.length;
+                        break;
+                    case Enter:
+                        switch (selectedIndex) {
+                            case 0:
+                                viewHistoricalPlacesUI.show();
+                                break;
+                            case 1:
+                                reviewsAndRatingsUI.show();
+                                break;
+                            case 2:
+                                settingsUI.show();
+                                break;
+                            case 3:
+                                screen.stopScreen();
+                                System.exit(0);
+                                break;
+                        }
+                        break;
+                    // Видаляємо case Escape
                 }
             }
-
-            screen.refresh();
-
-            KeyStroke keyStroke = screen.readInput();
-            switch (keyStroke.getKeyType()) {
-                case ArrowDown:
-                    selectedIndex = (selectedIndex + 1) % userMenuOptions.length;
-                    break;
-                case ArrowUp:
-                    selectedIndex =
-                        (selectedIndex - 1 + userMenuOptions.length) % userMenuOptions.length;
-                    break;
-                case Enter:
-                    switch (selectedIndex) {
-                        case 0:
-                            viewHistoricalPlacesUI.show(); // Викликаємо перегляд історичних місць
-                            break;
-                        case 1:
-                            // Додайте код для додавання відгуку
-                            break;
-                        case 2:
-                            // Додайте код для ставлення рейтингу
-                            break;
-                        case 3:
-                            settingsUI.show(); // Відкриваємо меню налаштувань
-                            break;
-                        case 4:
-                            screen.stopScreen();
-                            System.exit(0);  // Завершити програму
-                            break;
-                    }
-                    break;
-                case Escape:
-                    return;
-            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
