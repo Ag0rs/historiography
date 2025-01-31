@@ -1,14 +1,24 @@
 {
   "users": {
-    "user": {
-      "email": "user@gmail.com",
-      "password": "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92",
-      "role": "User"
-    },
     "admin": {
       "email": "admin@gmail.com",
       "password": "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92",
       "role": "Admin"
+    },
+    "Oleksandr": {
+      "email": "oleksandr@gmail.com",
+      "password": "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92",
+      "role": "Admin"
+    },
+    "user2": {
+      "email": "user2@hmail.com",
+      "password": "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92",
+      "role": "User"
+    },
+    "user": {
+      "email": "user@gmail.com",
+      "password": "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92",
+      "role": "User"
     }
   }
 }
